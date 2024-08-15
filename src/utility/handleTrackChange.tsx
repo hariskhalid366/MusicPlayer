@@ -11,11 +11,6 @@ export const handleTrackPlayerSong = async (
   setLoading: (loading: boolean) => void,
 ) => {
   const trackIndex = songs?.findIndex(track => track.url === selectedTrack.url);
-  console.log(trackIndex + ':Track index');
-
-  queueOffset = trackIndex;
-
-  console.log(queueOffset + ': queue offset');
 
   if (trackIndex === -1) return;
 
@@ -23,18 +18,22 @@ export const handleTrackPlayerSong = async (
 
   if (isChangingQueue) {
     setLoading(true);
-    queueOffset = trackIndex;
     await TrackPlayer.reset();
 
-    const beforeTracks = songs.slice(0, trackIndex);
-    const afterTracks = songs.slice(trackIndex + 1);
+    const newTrackQueue = [
+      ...songs.slice(0, trackIndex),
+      selectedTrack,
+      ...songs.slice(trackIndex + 1),
+    ];
 
-    await TrackPlayer.add(beforeTracks);
-    await TrackPlayer.add(selectedTrack);
-    await TrackPlayer.add(afterTracks);
+    await TrackPlayer.add(newTrackQueue);
 
+    await TrackPlayer.skip(trackIndex);
     await TrackPlayer.play();
+
     setLoading(false);
+
+    queueOffset = trackIndex;
 
     setActiveQueueId(id);
   } else {

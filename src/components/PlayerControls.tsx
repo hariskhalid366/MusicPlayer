@@ -75,7 +75,7 @@ export const MusicSlider = ({style}: SliderStyleProps) => {
       minimumValue={0}
       maximumValue={duration}
       minimumTrackTintColor="#FFFFFF"
-      maximumTrackTintColor="#ffffff77"
+      maximumTrackTintColor="#ffffff99"
       onValueChange={async value => {
         await TrackPlayer.seekTo(value);
       }}

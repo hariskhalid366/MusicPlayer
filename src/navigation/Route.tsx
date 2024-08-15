@@ -1,6 +1,6 @@
 import React, {memo, useCallback, useEffect} from 'react';
 import {AppState, AppStateStatus, TouchableOpacity} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, StackActions} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabs from './BottomTabs';
 import BootSplash from 'react-native-bootsplash';
@@ -100,7 +100,7 @@ const Route = () => {
             headerLeft: () => (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.goBack();
+                  navigation.pop();
                 }}
                 className="p-2 rounded-full bg-[#ffffff21]">
                 <Icon.ChevronDownIcon
@@ -116,7 +116,7 @@ const Route = () => {
           name="ArtistSongs"
           component={ArtistsSongs}
           options={({navigation}) => ({
-            headerTitle: 'Artists',
+            headerTitle: '',
             headerTitleStyle: {
               fontSize: 25,
               fontWeight: '500',
@@ -126,7 +126,7 @@ const Route = () => {
             headerLeft: () => (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.goBack();
+                  navigation.pop();
                 }}
                 className="p-2 rounded-full bg-[#ffffff21]">
                 <Icon.ChevronDownIcon
