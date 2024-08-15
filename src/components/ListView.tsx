@@ -1,5 +1,12 @@
 import React, {memo} from 'react';
-import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  TouchableHighlight,
+} from 'react-native';
 import * as Icon from 'react-native-heroicons/outline';
 import TrackPlayer, {
   useActiveTrack,
@@ -48,42 +55,45 @@ const ListView = ({item, handleTrack}: ListItemProps) => {
   };
 
   return (
-    <TouchableOpacity
+    <TouchableHighlight
+      underlayColor={'#ffffff11'}
+      activeOpacity={0.4}
       onPress={onPress}
-      activeOpacity={0.8}
       style={[styles.container, isActive && styles.activeContainer]}>
-      <Image
-        source={
-          item.cover ? {uri: item.cover} : require('../../assets/tile.jpeg')
-        }
-        style={styles.image}
-      />
-      {isActive && (
-        <View style={styles.icon}>
-          {playing ? (
-            <LoaderKit
-              name="LineScaleParty"
-              color="#fff"
-              style={styles.loader}
-            />
-          ) : (
-            <Icon.PlayIcon size={23} color="#fff" />
-          )}
+      <>
+        <Image
+          source={
+            item.cover ? {uri: item.cover} : require('../../assets/tile.jpeg')
+          }
+          style={styles.image}
+        />
+        {isActive && (
+          <View style={styles.icon}>
+            {playing ? (
+              <LoaderKit
+                name="LineScaleParty"
+                color="#fff"
+                style={styles.loader}
+              />
+            ) : (
+              <Icon.PlayIcon size={23} color="#fff" />
+            )}
+          </View>
+        )}
+        <View style={styles.infoContainer}>
+          <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
+            {item.title}
+          </Text>
+          <Text style={styles.artist} numberOfLines={1}>
+            {item.artist.slice(0, 30) + '...'} •{' '}
+            {convertMillisecondsToTime(item.duration)}
+          </Text>
         </View>
-      )}
-      <View style={styles.infoContainer}>
-        <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
-          {item.title}
-        </Text>
-        <Text style={styles.artist} numberOfLines={1}>
-          {item.artist.slice(0, 30) + '...'} •{' '}
-          {convertMillisecondsToTime(item.duration)}
-        </Text>
-      </View>
-      <TouchableOpacity style={styles.moreButton}>
-        <Icon.EllipsisHorizontalIcon color="#fff" size={22} />
-      </TouchableOpacity>
-    </TouchableOpacity>
+        <TouchableOpacity style={styles.moreButton}>
+          <Icon.EllipsisHorizontalIcon color="#fff" size={22} />
+        </TouchableOpacity>
+      </>
+    </TouchableHighlight>
   );
 };
 
@@ -133,6 +143,7 @@ const styles = StyleSheet.create({
   },
   moreButton: {
     padding: 4,
+    zIndex: 20,
     marginHorizontal: 2,
     backgroundColor: 'rgba(255, 255, 255, 0.13)',
     borderRadius: 20,

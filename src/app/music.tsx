@@ -114,7 +114,7 @@ const Main = () => {
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
       <ScrollView
-        decelerationRate={'normal'}
+        decelerationRate={0.7}
         scrollEventThrottle={17}
         contentContainerStyle={{
           paddingHorizontal: 10,

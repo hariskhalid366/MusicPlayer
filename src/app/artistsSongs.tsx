@@ -32,6 +32,8 @@ const ArtistsSongs = ({route}: any) => {
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
       <ScrollView
+        decelerationRate={0.7}
+        scrollEventThrottle={17}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,

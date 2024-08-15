@@ -65,19 +65,6 @@ const BottomTabs = () => {
         <Tab.Screen
           options={{
             tabBarIcon: ({focused}) => (
-              <Icon.QueueListIcon
-                color={focused ? '#ef4444' : '#ffffff88'}
-                size={23}
-                strokeWidth={2}
-              />
-            ),
-          }}
-          name="Playlist"
-          component={Playlist}
-        />
-        <Tab.Screen
-          options={{
-            tabBarIcon: ({focused}) => (
               <Icon.HeartIcon
                 color={focused ? '#ef4444' : '#ffffff88'}
                 size={23}
@@ -88,6 +75,20 @@ const BottomTabs = () => {
           name="Favourite"
           component={Favourite}
         />
+        <Tab.Screen
+          options={{
+            tabBarIcon: ({focused}) => (
+              <Icon.QueueListIcon
+                color={focused ? '#ef4444' : '#ffffff88'}
+                size={23}
+                strokeWidth={2}
+              />
+            ),
+          }}
+          name="Playlist"
+          component={Playlist}
+        />
+
         <Tab.Screen
           options={{
             tabBarIcon: ({focused}) => (
