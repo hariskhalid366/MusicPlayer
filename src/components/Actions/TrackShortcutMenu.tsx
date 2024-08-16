@@ -52,6 +52,8 @@ const TrackShortcutMenu = ({itemUrl, track, children}: Props) => {
             android: 'ic_menu_add',
           }),
           imageColor: '#fff',
+          titleColor: '#fff',
+          displayInline: true,
         },
         {
           id: 'add-to-favourite',
@@ -63,6 +65,8 @@ const TrackShortcutMenu = ({itemUrl, track, children}: Props) => {
             ios: isLiked(itemUrl) ? 'heart.fill' : 'heart',
           }),
           imageColor: '#e74444',
+          titleColor: '#fff',
+          displayInline: true,
         },
       ]}>
       {children}

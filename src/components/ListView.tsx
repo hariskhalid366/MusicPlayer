@@ -13,6 +13,7 @@ import TrackPlayer, {
   useIsPlaying,
 } from 'react-native-track-player';
 import LoaderKit from 'react-native-loader-kit';
+import TrackShortcutMenu from './Actions/TrackShortcutMenu';
 
 export type MusicFile = {
   album: string;
@@ -89,9 +90,11 @@ const ListView = ({item, handleTrack}: ListItemProps) => {
             {convertMillisecondsToTime(item.duration)}
           </Text>
         </View>
-        <TouchableOpacity style={styles.moreButton}>
-          <Icon.EllipsisHorizontalIcon color="#fff" size={22} />
-        </TouchableOpacity>
+        <TrackShortcutMenu track={item} itemUrl={item.url}>
+          <TouchableOpacity style={styles.moreButton}>
+            <Icon.EllipsisHorizontalIcon color="#fff" size={22} />
+          </TouchableOpacity>
+        </TrackShortcutMenu>
       </>
     </TouchableHighlight>
   );

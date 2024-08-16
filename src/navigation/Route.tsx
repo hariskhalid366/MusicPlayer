@@ -60,7 +60,6 @@ const Route = () => {
     <NavigationContainer
       onReady={() => {
         console.log('Navigation ready');
-        init();
       }}
       theme={{
         dark: true,
