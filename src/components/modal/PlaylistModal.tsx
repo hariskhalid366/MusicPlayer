@@ -27,7 +27,7 @@ const PlaylistModal = ({
     <Modal transparent animationType="slide" visible={modal}>
       <Pressable
         onPress={() => setModal(false)}
-        className="flex-1 justify-center z-0 items-center bg-[#00000088]">
+        className="flex-1 justify-center z-0 items-center bg-[#00000099]">
         <View className="w-2/3 z-20 rounded-xl p-3 justify-between bg-zinc-800">
           <Text className="text-white text-xl font-bold">
             Create a playlist

@@ -85,7 +85,7 @@ const Playlist = () => {
             paddingBottom: 150,
           }}>
           {validPlaylistSongs?.map((item, index) => (
-            <PlayLIstItemView {...{index, item}} />
+            <PlayLIstItemView key={index} {...{index, item}} />
           ))}
         </ScrollView>
       ) : (

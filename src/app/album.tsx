@@ -68,7 +68,7 @@ const Album = ({navigation}: any) => {
             <Icon.UserIcon
               color={'#fff'}
               size={50}
-              className="mr-4 rounded-full bg-zinc-600"
+              className="mr-4 rounded-full bg-[#1F1F1F]"
             />
             <Text className="w-4/5 text-white font-semibold tracking-wide">
               {artistKey}

@@ -12,6 +12,7 @@ export const handleTrackPlayerSong = async (
 ) => {
   const trackIndex = songs?.findIndex(track => track.url === selectedTrack.url);
 
+  queueOffset = trackIndex;
   if (trackIndex === -1) return;
 
   const isChangingQueue = id !== activeQueueId;

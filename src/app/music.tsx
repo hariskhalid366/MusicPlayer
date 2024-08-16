@@ -23,9 +23,6 @@ import {handleTrackPlayerSong} from '../utility/handleTrackChange';
 const Main = () => {
   const id = 'songs';
   const [loading, setLoading] = useState(false);
-  //
-  console.log(loading);
-  //
   const [search, setSearch] = useState<string>('');
   const {activeQueueId, setActiveQueueId} = useQueue();
   const [music, setMusic] = useMMKVObject<string | MusicFile[]>(
