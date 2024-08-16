@@ -60,7 +60,10 @@ const Album = ({navigation}: any) => {
         {Object.entries(artist || {}).map(([artistKey, songs]) => (
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('ArtistSongs', {songs});
+              navigation.navigate('ArtistSongs', {
+                songs: songs,
+                name: artistKey.slice(0, 25) + '...',
+              });
             }}
             activeOpacity={0.7}
             key={artistKey}

@@ -5,8 +5,8 @@ export const handleTrackPlayerSong = async (
   selectedTrack: any,
   songs: MusicFile[],
   id: string,
-  activeQueueId: string | null,
-  setActiveQueueId: (id: string) => void,
+  queueId: string | undefined,
+  setQueueId: (id: string) => void,
   queueOffset: number,
   setLoading: (loading: boolean) => void,
 ) => {
@@ -15,7 +15,7 @@ export const handleTrackPlayerSong = async (
   queueOffset = trackIndex;
   if (trackIndex === -1) return;
 
-  const isChangingQueue = id !== activeQueueId;
+  const isChangingQueue = id !== queueId;
 
   if (isChangingQueue) {
     setLoading(true);
@@ -36,7 +36,7 @@ export const handleTrackPlayerSong = async (
 
     queueOffset = trackIndex;
 
-    setActiveQueueId(id);
+    setQueueId(id);
   } else {
     await TrackPlayer.skip(trackIndex);
     await TrackPlayer.play();

@@ -60,6 +60,7 @@ const Route = () => {
     <NavigationContainer
       onReady={() => {
         console.log('Navigation ready');
+        init();
       }}
       theme={{
         dark: true,
@@ -115,9 +116,8 @@ const Route = () => {
           name="ArtistSongs"
           component={ArtistsSongs}
           options={({navigation}) => ({
-            headerTitle: '',
             headerTitleStyle: {
-              fontSize: 25,
+              fontSize: 18,
               fontWeight: '500',
             },
             headerTitleAlign: 'center',

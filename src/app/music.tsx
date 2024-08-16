@@ -1,12 +1,14 @@
 import {
+  FlatList,
   PermissionsAndroid,
   Platform,
   ScrollView,
+  Text,
   ToastAndroid,
   View,
 } from 'react-native';
 import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
-import {useMMKVObject} from 'react-native-mmkv';
+import {useMMKVObject, useMMKVString} from 'react-native-mmkv';
 import {Storage} from '../constants/Store';
 
 import {
@@ -16,7 +18,6 @@ import {
 } from 'react-native-get-music-files';
 import ListView, {MusicFile} from '../components/ListView';
 import HeaderSearchBar from '../components/HeaderSearchBar';
-import {useQueue} from '../constants/QueueStore';
 import LoadingTrack from '../components/loading';
 import {handleTrackPlayerSong} from '../utility/handleTrackChange';
 
@@ -24,7 +25,7 @@ const Main = () => {
   const id = 'songs';
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState<string>('');
-  const {activeQueueId, setActiveQueueId} = useQueue();
+  const [queueId, setQueueId] = useMMKVString('queueId', Storage);
   const [music, setMusic] = useMMKVObject<string | MusicFile[]>(
     'musicList',
     Storage,
@@ -98,40 +99,51 @@ const Main = () => {
         selectedTrack,
         musicArray,
         id,
-        activeQueueId,
-        setActiveQueueId,
+        queueId,
+        setQueueId,
         queueOffset.current,
         setLoading,
       );
     },
-    [id, musicArray, activeQueueId, setActiveQueueId, queueOffset],
+    [id, musicArray, queueId, setQueueId, queueOffset],
   );
 
   return (
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
-      <ScrollView
+
+      <FlatList
+        ListHeaderComponent={() => (
+          <HeaderSearchBar
+            title={'Songs'}
+            search={search}
+            setSearch={setSearch}
+            track={musicArray}
+          />
+        )}
+        ListEmptyComponent={() => (
+          <View className="justify-center items-center my-5">
+            <Text className="text-base font-semibold text-white">
+              Song not found
+            </Text>
+          </View>
+        )}
         decelerationRate={0.7}
         scrollEventThrottle={17}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,
-        }}>
-        <HeaderSearchBar
-          title={'Songs'}
-          search={search}
-          setSearch={setSearch}
-          track={musicArray}
-        />
-        {filteredMusic.map((item, index) => (
+        }}
+        data={filteredMusic}
+        renderItem={({item, index}) => (
           <ListView
             key={index}
             index={index}
             item={item}
             handleTrack={onHandleTrackPlayerSong}
           />
-        ))}
-      </ScrollView>
+        )}
+      />
     </View>
   );
 };

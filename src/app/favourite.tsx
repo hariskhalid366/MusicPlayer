@@ -1,9 +1,8 @@
-import {ScrollView, View} from 'react-native';
-import React, {memo, useEffect, useRef, useState} from 'react';
+import {FlatList, ScrollView, View} from 'react-native';
+import React, {memo, useRef, useState} from 'react';
 import ListView, {MusicFile} from '../components/ListView';
 import {Storage} from '../constants/Store';
-import {useMMKVObject} from 'react-native-mmkv';
-import {useQueue} from '../constants/QueueStore';
+import {useMMKVObject, useMMKVString} from 'react-native-mmkv';
 import LoadingTrack from '../components/loading';
 import {handleTrackPlayerSong} from '../utility/handleTrackChange';
 
@@ -11,9 +10,9 @@ const Favourite = () => {
   const id = 'favourite';
   const queueOffset = useRef(0);
   const [loading, setLoading] = useState(false);
+  const [queueId, setQueueId] = useMMKVString('queueId', Storage);
   const [like, setLike] = useMMKVObject<MusicFile[]>('liked', Storage);
   const [search, setSearch] = useState('');
-  const {activeQueueId, setActiveQueueId} = useQueue();
   const musicArray = Array.isArray(like) ? like : [];
   const filteredMusic = musicArray.filter(
     (item: MusicFile) =>
@@ -26,32 +25,33 @@ const Favourite = () => {
       selectedTrack,
       musicArray,
       id,
-      activeQueueId,
-      setActiveQueueId,
+      queueId,
+      setQueueId,
       queueOffset.current,
-      setLoading, // Pass the current ref value
+      setLoading,
     );
   };
 
   return (
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
-      <ScrollView
+      <FlatList
         decelerationRate={0.7}
         scrollEventThrottle={17}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,
-        }}>
-        {filteredMusic.map((item, index) => (
+        }}
+        data={filteredMusic}
+        renderItem={({item, index}) => (
           <ListView
             key={index}
             index={index}
             item={item}
             handleTrack={onHandleTrackPlayerSong}
           />
-        ))}
-      </ScrollView>
+        )}
+      />
     </View>
   );
 };

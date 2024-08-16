@@ -14,6 +14,7 @@ const BottomTabs = () => {
   return (
     <>
       <Tab.Navigator
+        sceneContainerStyle={{backgroundColor: '#000'}}
         initialRouteName="Songs"
         screenOptions={({route}) => ({
           tabBarLabel: ({focused}) => (

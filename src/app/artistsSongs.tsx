@@ -1,17 +1,25 @@
-import {ScrollView, Text, View} from 'react-native';
-import React, {memo, useCallback, useRef, useState} from 'react';
-import * as Icon from 'react-native-heroicons/solid';
+import {FlatList, View} from 'react-native';
+import React, {useCallback, useLayoutEffect, useRef, useState} from 'react';
 import ListView, {MusicFile} from '../components/ListView';
-import {useQueue} from '../constants/QueueStore';
 import {handleTrackPlayerSong} from '../utility/handleTrackChange';
 import LoadingTrack from '../components/loading';
+import {useMMKVString} from 'react-native-mmkv';
+import {Storage} from '../constants/Store';
 
-const ArtistsSongs = ({route}: any) => {
+const ArtistsSongs = ({route, navigation}: any) => {
+  const name: string = route?.params?.name;
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: name,
+    });
+  }, [navigation, name]);
+
   const queueOffset = useRef(0);
   const songs: MusicFile[] = route?.params?.songs;
   const id = songs[0].artist;
   const [loading, setLoading] = useState(false);
-  const {activeQueueId, setActiveQueueId} = useQueue();
+  const [queueId, setQueueId] = useMMKVString('queueId', Storage);
 
   const onHandleTrackPlayerSong = useCallback(
     async (selectedTrack: MusicFile) => {
@@ -19,39 +27,35 @@ const ArtistsSongs = ({route}: any) => {
         selectedTrack,
         songs,
         id,
-        activeQueueId,
-        setActiveQueueId,
-        queueOffset.current, // Pass the current ref value
+        queueId,
+        setQueueId,
+        queueOffset.current,
         setLoading,
       );
     },
-    [id, songs, activeQueueId, setActiveQueueId, queueOffset],
+    [id, songs, queueId, setQueueId, queueOffset],
   );
 
   return (
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
-      <ScrollView
+      <FlatList
         decelerationRate={0.7}
         scrollEventThrottle={17}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,
-        }}>
-        <View className="justify-center my-2 items-center">
-          <Text className="font-bold px-4 text-center tracking-wide text-white text-xl">
-            {songs[0].artist}
-          </Text>
-        </View>
-        {songs.map((item, index) => (
+        }}
+        data={songs}
+        renderItem={({item, index}) => (
           <ListView
             key={index}
             index={index}
             item={item}
             handleTrack={onHandleTrackPlayerSong}
           />
-        ))}
-      </ScrollView>
+        )}
+      />
     </View>
   );
 };
