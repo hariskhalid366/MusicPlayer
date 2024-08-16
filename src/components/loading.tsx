@@ -6,7 +6,7 @@ const LoadingTrack = () => {
   return (
     <View className="justify-center items-center h-full w-full bg-[#00000099]  absolute z-40">
       <LoaderKit
-        name="BallGridPulse"
+        name="LineSpinFadeLoader"
         color="#fff"
         style={{width: 40, height: 40}}
       />

@@ -15,6 +15,7 @@ import {useMMKVObject} from 'react-native-mmkv';
 import {Storage} from '../constants/Store';
 import {MusicFile} from '../components/ListView';
 import PlayLIstItemView from '../components/PlayLIstItemView';
+import PlaylistModal from '../components/modal/PlaylistModal';
 
 interface PlaylistProps {
   id: string;
@@ -67,6 +68,14 @@ const Playlist = () => {
 
   return (
     <View className="flex-1">
+      {validPlaylistSongs.length > 0 && (
+        <TouchableOpacity
+          onPress={() => setModal(true)}
+          className="absolute rounded-2xl z-10 bottom-[140px] bg-white right-3 gap-x-1 p-2 flex-row">
+          <Icon.PlusIcon strokeWidth={3} color={'#000'} size={20} />
+          <Text className="text-sm text-black font-bold">Add Playlist</Text>
+        </TouchableOpacity>
+      )}
       {validPlaylistSongs.length > 0 ? (
         <ScrollView
           decelerationRate={0.7}
@@ -90,41 +99,7 @@ const Playlist = () => {
         </TouchableOpacity>
       )}
 
-      <Modal transparent animationType="slide" visible={modal}>
-        <Pressable
-          onPress={() => setModal(false)}
-          className="flex-1 justify-center z-0 items-center bg-[#00000088]">
-          <View className="w-2/3 z-20 rounded-xl p-3 justify-between bg-zinc-800">
-            <Text className="text-white text-xl font-bold">
-              Create a playlist
-            </Text>
-            <View className="my-2 space-y-1">
-              <Text className="text-white font-semibold text-sm">Title</Text>
-              <TextInput
-                autoFocus
-                value={text}
-                onChangeText={e => setText(e)}
-                maxLength={160}
-                cursorColor={'#ffffff'}
-                style={{
-                  borderBottomWidth: 2,
-                  padding: 0,
-                  borderBottomColor: '#fff',
-                }}
-              />
-              <Text className="text-right">{text.length}/160</Text>
-            </View>
-            <View className="flex-row items-center justify-end space-x-8 mt-4 mb-1">
-              <TouchableOpacity onPress={() => setModal(false)}>
-                <Text className="text-white font-semibold">Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => createPlaylist(text)}>
-                <Text className="text-white font-semibold">Create</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Pressable>
-      </Modal>
+      <PlaylistModal {...{modal, setModal, text, setText, createPlaylist}} />
     </View>
   );
 };
