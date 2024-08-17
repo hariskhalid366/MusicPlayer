@@ -1,46 +1,37 @@
-import {Image, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import React, {memo} from 'react';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useActiveTrack} from 'react-native-track-player';
 import PlayPause, {Forward, MusicSlider} from './PlayerControls';
 import {useNavigation} from '@react-navigation/native';
 
 const FloatingTrack = () => {
-  const navigation = useNavigation<any>();
-
+  const navigation: any = useNavigation();
   const track = useActiveTrack();
+
   if (!track) return null;
 
   return (
     <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('screen');
-      }}
+      onPress={() => navigation.navigate('screen')}
       activeOpacity={0.8}
-      className=" items-center w-full absolute bottom-[60px]  ">
-      <View
-        style={{
-          borderWidth: 1.2,
-          borderColor: '#ffffff22',
-        }}
-        className="bg-red-500/90 flex-row p-1 items-center mx-3 rounded-2xl">
+      style={styles.container}>
+      <View style={styles.innerContainer}>
         <Image
           source={
             track?.cover
-              ? {uri: track?.cover}
+              ? {uri: track.cover}
               : require('../../assets/tile.jpeg')
           }
-          style={{width: 60, height: 60, borderRadius: 50}}
+          style={styles.image}
         />
-        <View className="flex-1">
+        <View style={styles.trackInfo}>
           <Text
-            className=" mx-2 text-white font-semibold"
-            lineBreakMode="tail"
-            numberOfLines={1}>
-            {track?.title?.slice(0, 29)}
+            style={styles.trackTitle}
+            numberOfLines={1}
+            ellipsizeMode="tail">
+            {track.title?.slice(0, 29)}
           </Text>
-          <MusicSlider
-            style={{width: 220, height: 20, marginLeft: -7, padding: 0}}
-          />
+          <MusicSlider style={styles.slider} />
         </View>
         <PlayPause size={23} color="#fff" />
         <Forward size={23} color="#fff" />
@@ -49,4 +40,42 @@ const FloatingTrack = () => {
   );
 };
 
-export default FloatingTrack;
+const styles = StyleSheet.create({
+  container: {
+    width: '95%',
+    position: 'absolute',
+    alignItems: 'center',
+    alignSelf: 'center',
+    bottom: 59,
+  },
+  innerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 1,
+    marginHorizontal: 3,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255, 0, 0, 0.7)',
+    borderWidth: 1.2,
+    borderColor: '#ffffff22',
+  },
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 15,
+  },
+  trackInfo: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  trackTitle: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  slider: {
+    width: 220,
+    height: 20,
+    marginLeft: -12,
+  },
+});
+
+export default memo(FloatingTrack);

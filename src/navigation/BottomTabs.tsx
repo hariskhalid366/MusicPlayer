@@ -22,7 +22,7 @@ const BottomTabs = () => {
               style={{
                 fontSize: 12,
                 fontWeight: 500,
-                color: focused ? '#ef4444' : '#ffffff88',
+                color: focused ? 'rgba(255, 0, 0, 0.7)' : '#ffffff88',
               }}>
               {route.name}
             </Text>
@@ -56,7 +56,7 @@ const BottomTabs = () => {
             headerShown: false,
             tabBarIcon: ({focused}) => (
               <Icon.MusicalNoteIcon
-                color={focused ? '#ef4444' : '#ffffff88'}
+                color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
                 size={23}
                 strokeWidth={2}
               />
@@ -67,7 +67,7 @@ const BottomTabs = () => {
           options={{
             tabBarIcon: ({focused}) => (
               <Icon.HeartIcon
-                color={focused ? '#ef4444' : '#ffffff88'}
+                color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
                 size={23}
                 strokeWidth={2}
               />
@@ -80,7 +80,7 @@ const BottomTabs = () => {
           options={{
             tabBarIcon: ({focused}) => (
               <Icon.QueueListIcon
-                color={focused ? '#ef4444' : '#ffffff88'}
+                color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
                 size={23}
                 strokeWidth={2}
               />
@@ -94,7 +94,7 @@ const BottomTabs = () => {
           options={{
             tabBarIcon: ({focused}) => (
               <Icon.UserGroupIcon
-                color={focused ? '#ef4444' : '#ffffff88'}
+                color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
                 size={23}
                 strokeWidth={2}
               />

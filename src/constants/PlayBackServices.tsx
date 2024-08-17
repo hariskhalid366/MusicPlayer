@@ -49,6 +49,7 @@ export async function playbackService() {
         Capability.SkipToNext,
         Capability.SkipToPrevious,
       ],
+      color: 99410543,
     });
   } catch (error) {
     console.log(error);

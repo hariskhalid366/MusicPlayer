@@ -17,7 +17,7 @@ import {MusicFile} from '../components/ListView';
 import PlayLIstItemView from '../components/PlayLIstItemView';
 import PlaylistModal from '../components/modal/PlaylistModal';
 
-interface PlaylistProps {
+export interface PlaylistProps {
   id: string;
   songs: MusicFile[];
 }
@@ -103,8 +103,8 @@ const Playlist = () => {
       )}
       {validPlaylistSongs.length > 0 ? (
         <ScrollView
-          decelerationRate={0.7}
-          scrollEventThrottle={17}
+          decelerationRate={0.6}
+          scrollEventThrottle={16}
           contentContainerStyle={{
             paddingHorizontal: 10,
             paddingBottom: 150,

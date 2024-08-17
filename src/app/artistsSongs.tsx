@@ -8,6 +8,7 @@ import {Storage} from '../constants/Store';
 
 const ArtistsSongs = ({route, navigation}: any) => {
   const name: string = route?.params?.name;
+  const [scroll, setScroll] = useState<boolean>(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -40,8 +41,10 @@ const ArtistsSongs = ({route, navigation}: any) => {
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
       <FlatList
-        decelerationRate={0.7}
-        scrollEventThrottle={17}
+        onScroll={() => setScroll(true)}
+        maxToRenderPerBatch={10}
+        decelerationRate={0.6}
+        scrollEventThrottle={16}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,
@@ -49,6 +52,7 @@ const ArtistsSongs = ({route, navigation}: any) => {
         data={songs}
         renderItem={({item, index}) => (
           <ListView
+            scroll={scroll}
             key={index}
             index={index}
             item={item}

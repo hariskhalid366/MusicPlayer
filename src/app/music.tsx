@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   FlatList,
   PermissionsAndroid,
   Platform,
@@ -22,6 +21,7 @@ import HeaderSearchBar from '../components/HeaderSearchBar';
 import LoadingTrack from '../components/loading';
 import {handleTrackPlayerSong} from '../utility/handleTrackChange';
 import TrackPlayer from 'react-native-track-player';
+import AddSongModal from '../components/modal/AddToPlaylistModal';
 
 const Main = () => {
   const id = 'songs';
@@ -116,6 +116,7 @@ const Main = () => {
   );
 
   const [refreshing, setRefreshing] = useState(false);
+  const [scroll, setScroll] = useState<boolean>(false);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -140,6 +141,7 @@ const Main = () => {
             key={item.url}
             index={index}
             item={item}
+            scroll={scroll}
             handleTrack={onHandleTrackPlayerSong}
           />
         )}
@@ -158,14 +160,16 @@ const Main = () => {
             </Text>
           </View>
         )}
-        maxToRenderPerBatch={20}
-        decelerationRate={0.7}
-        scrollEventThrottle={17}
+        onScroll={() => setScroll(true)}
+        maxToRenderPerBatch={10}
+        decelerationRate={0.6}
+        scrollEventThrottle={16}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,
         }}
       />
+      <AddSongModal />
     </View>
   );
 };

@@ -33,7 +33,6 @@ export const handleTrackPlayerSong = async (
     await TrackPlayer.play();
 
     setLoading(false);
-
     queueOffset = trackIndex;
 
     setQueueId(id);

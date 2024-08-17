@@ -1,5 +1,5 @@
-import {StyleProp, TouchableOpacity, ViewStyle} from 'react-native';
-import React from 'react';
+import React, {memo} from 'react';
+import {StyleProp, TouchableOpacity, ViewStyle, StyleSheet} from 'react-native';
 import * as Icon from 'react-native-heroicons/outline';
 import TrackPlayer, {
   useIsPlaying,
@@ -16,53 +16,64 @@ interface SliderStyleProps {
   style?: StyleProp<ViewStyle>;
 }
 
-const style = 'p-2 bg-[#ffffff21] m-1 rounded-full';
+const styles = StyleSheet.create({
+  touchable: {
+    padding: 8,
+    backgroundColor: '#ffffff33',
+    margin: 4,
+    borderRadius: 50,
+  },
+});
 
-export const Forward = ({size, color}: IconProps) => {
-  return (
-    <TouchableOpacity
-      className={style}
-      onPress={() => {
-        TrackPlayer.skipToNext();
-      }}>
-      <Icon.ForwardIcon size={size} color={color} strokeWidth={2} />
-    </TouchableOpacity>
-  );
-};
+const ControlButton = memo(({onPress, IconComponent, size, color}: any) => (
+  <TouchableOpacity style={styles.touchable} onPress={onPress}>
+    <IconComponent size={size} color={color} strokeWidth={2} />
+  </TouchableOpacity>
+));
 
-export const Backword = ({size, color}: IconProps) => {
-  return (
-    <TouchableOpacity
-      className={style}
-      onPress={() => {
-        TrackPlayer.skipToPrevious();
-      }}>
-      <Icon.BackwardIcon size={size} color={color} strokeWidth={2} />
-    </TouchableOpacity>
-  );
-};
+export const Forward = ({size, color}: IconProps) => (
+  <ControlButton
+    onPress={async () => {
+      await TrackPlayer.pause();
+      await TrackPlayer.skipToNext();
+      await TrackPlayer.play();
+    }}
+    IconComponent={Icon.ForwardIcon}
+    size={size}
+    color={color}
+  />
+);
+
+export const Backward = ({size, color}: IconProps) => (
+  <ControlButton
+    onPress={async () => {
+      await TrackPlayer.pause();
+      await TrackPlayer.skipToPrevious();
+      await TrackPlayer.play();
+    }}
+    IconComponent={Icon.BackwardIcon}
+    size={size}
+    color={color}
+  />
+);
 
 const PlayPause = ({size, color}: IconProps) => {
-  const play = useIsPlaying();
+  const isPlaying = useIsPlaying();
+  const togglePlayPause = () => {
+    isPlaying.playing ? TrackPlayer.pause() : TrackPlayer.play();
+  };
+
   return (
-    <TouchableOpacity
-      className={style}
-      onPress={() => {
-        if (play.playing === !true) {
-          TrackPlayer.play();
-        } else {
-          TrackPlayer.pause();
-        }
-      }}>
-      {play.playing === true ? (
-        <Icon.PauseIcon size={size} color={color} strokeWidth={2} />
-      ) : (
-        <Icon.PlayIcon size={size} color={color} strokeWidth={2} />
-      )}
-    </TouchableOpacity>
+    <ControlButton
+      onPress={togglePlayPause}
+      IconComponent={isPlaying.playing ? Icon.PauseIcon : Icon.PlayIcon}
+      size={size}
+      color={color}
+    />
   );
 };
-export default PlayPause;
+
+export default memo(PlayPause);
 
 export const MusicSlider = ({style}: SliderStyleProps) => {
   const {position, duration} = useProgress();
@@ -76,9 +87,7 @@ export const MusicSlider = ({style}: SliderStyleProps) => {
       maximumValue={duration}
       minimumTrackTintColor="#FFFFFF"
       maximumTrackTintColor="#ffffff99"
-      onValueChange={async value => {
-        await TrackPlayer.seekTo(value);
-      }}
+      onSlidingComplete={TrackPlayer.seekTo}
     />
   );
 };

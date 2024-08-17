@@ -10,6 +10,7 @@ const Favourite = () => {
   const id = 'favourite';
   const queueOffset = useRef(0);
   const [loading, setLoading] = useState(false);
+  const [scroll, setScroll] = useState<boolean>(false);
   const [queueId, setQueueId] = useMMKVString('queueId', Storage);
   const [like, setLike] = useMMKVObject<MusicFile[]>('liked', Storage);
   const [search, setSearch] = useState('');
@@ -36,8 +37,10 @@ const Favourite = () => {
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
       <FlatList
-        decelerationRate={0.7}
-        scrollEventThrottle={17}
+        onScroll={() => setScroll(true)}
+        maxToRenderPerBatch={10}
+        decelerationRate={0.6}
+        scrollEventThrottle={16}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,
@@ -45,6 +48,7 @@ const Favourite = () => {
         data={filteredMusic}
         renderItem={({item, index}) => (
           <ListView
+            scroll={scroll}
             key={index}
             index={index}
             item={item}

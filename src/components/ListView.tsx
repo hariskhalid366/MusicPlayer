@@ -23,6 +23,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {useMMKVObject} from 'react-native-mmkv';
 import {Storage} from '../constants/Store';
+import {useGlobalState} from '../constants/PlaylistContextState';
 
 export type MusicFile = {
   album: string;
@@ -37,6 +38,7 @@ interface ListItemProps {
   item: MusicFile;
   index: number;
   handleTrack: (track: MusicFile) => void;
+  scroll: boolean;
 }
 
 export const convertMillisecondsToTime = (milliseconds: number) => {
@@ -47,10 +49,11 @@ export const convertMillisecondsToTime = (milliseconds: number) => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-const ListView = ({item, index, handleTrack}: ListItemProps) => {
+const ListView = ({item, scroll, index, handleTrack}: ListItemProps) => {
   const activeTrack = useActiveTrack();
   const isActive = activeTrack?.url === item?.url;
   const {playing} = useIsPlaying();
+  const {setIsVisible, setCurrentTrack} = useGlobalState();
 
   const onPress = () => {
     if (isActive) {
@@ -94,10 +97,15 @@ const ListView = ({item, index, handleTrack}: ListItemProps) => {
   });
 
   const toggleDropdown = () => {
-    dropDown.value =
-      dropDown.value === 0
-        ? withSpring(1, {damping: 20})
-        : withSpring(0, {damping: 20});
+    if (dropDown.value === 0) {
+      dropDown.value = withSpring(1, {damping: 20});
+
+      setTimeout(() => {
+        dropDown.value = withSpring(0, {damping: 20});
+      }, 5000);
+    } else {
+      dropDown.value = withSpring(0, {damping: 20});
+    }
   };
 
   return (
@@ -143,13 +151,16 @@ const ListView = ({item, index, handleTrack}: ListItemProps) => {
         </View>
         <Animated.View style={[animatedStyles, styles.dropdownContainer]}>
           <TouchableOpacity
-            onPress={() => console.log('Add to playlist')}
+            onPress={() => {
+              setIsVisible(true);
+              setCurrentTrack(item);
+            }}
             style={styles.dropdownItem}>
             <Icon.PlusIcon size={22} color={'#fff'} />
             <Text style={styles.dropdownText}>Add to playlist</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => console.log('Add to favourite')}
+            onPress={() => ToggleLike(item)}
             style={styles.dropdownItem}>
             {isLiked(item.url) ? (
               <IconSolid.HeartIcon size={22} color={'#fff'} />
@@ -164,7 +175,7 @@ const ListView = ({item, index, handleTrack}: ListItemProps) => {
   );
 };
 
-export default ListView;
+export default memo(ListView);
 
 const styles = StyleSheet.create({
   container: {

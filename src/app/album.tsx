@@ -50,7 +50,7 @@ const Album = ({navigation}: any) => {
   return (
     <View className="justify-center items-center flex-1 ">
       <ScrollView
-        decelerationRate={0.7}
+        decelerationRate={0.6}
         scrollEventThrottle={17}
         contentContainerStyle={{
           gap: 15,
