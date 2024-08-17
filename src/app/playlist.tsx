@@ -63,6 +63,31 @@ const Playlist = () => {
     setModal(false);
   };
 
+  const deletePlaylist = (playlistName: string) => {
+    const playlistExist = playlistSongs?.some(playlist => {
+      playlist.id === playlistName.trim();
+    });
+    if (!playlistExist) {
+      ToastAndroid.showWithGravity(
+        'No playlist exists of name' + `${playlistName}`,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return;
+    }
+
+    const updatePlaylist = playlistSongs?.filter(
+      playlist => playlist.id !== playlistName,
+    );
+    setPlaylistSongs(updatePlaylist);
+
+    ToastAndroid.showWithGravity(
+      'Playlist removed',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER,
+    );
+  };
+
   // Ensure playlistSongs is always an array
   const validPlaylistSongs = playlistSongs || [];
 

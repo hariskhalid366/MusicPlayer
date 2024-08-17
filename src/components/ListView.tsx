@@ -8,12 +8,21 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import * as Icon from 'react-native-heroicons/outline';
+import * as IconSolid from 'react-native-heroicons/solid';
 import TrackPlayer, {
   useActiveTrack,
   useIsPlaying,
 } from 'react-native-track-player';
 import LoaderKit from 'react-native-loader-kit';
-import TrackShortcutMenu from './Actions/TrackShortcutMenu';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import {useMMKVObject} from 'react-native-mmkv';
+import {Storage} from '../constants/Store';
 
 export type MusicFile = {
   album: string;
@@ -38,63 +47,118 @@ export const convertMillisecondsToTime = (milliseconds: number) => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-const ListView = ({item, handleTrack}: ListItemProps) => {
+const ListView = ({item, index, handleTrack}: ListItemProps) => {
   const activeTrack = useActiveTrack();
   const isActive = activeTrack?.url === item?.url;
   const {playing} = useIsPlaying();
 
   const onPress = () => {
     if (isActive) {
-      if (playing) {
-        TrackPlayer.pause();
-      } else {
-        TrackPlayer.play();
-      }
+      playing ? TrackPlayer.pause() : TrackPlayer.play();
     } else {
       handleTrack(item);
     }
   };
 
+  const [like, setLike] = useMMKVObject<MusicFile[]>('liked', Storage);
+
+  const isLiked = (itemUrl: string) =>
+    like?.some(likedItem => likedItem.url === itemUrl);
+
+  const ToggleLike = (track: MusicFile) => {
+    setLike(prevLikedItems => {
+      if (!prevLikedItems) {
+        return [track];
+      }
+      if (prevLikedItems.some(likedItem => likedItem.url === track.url)) {
+        return prevLikedItems.filter(likedItem => likedItem.url !== track.url);
+      } else {
+        return [...prevLikedItems, track];
+      }
+    });
+  };
+
+  const dropDown = useSharedValue(0);
+  const animatedStyles = useAnimatedStyle(() => {
+    const height = interpolate(
+      dropDown.value,
+      [0, 1],
+      [0, 40], // Increased height for better visibility
+      Extrapolation.CLAMP,
+    );
+
+    return {
+      height,
+      opacity: dropDown.value, // Adjust opacity for smoother transition
+    };
+  });
+
+  const toggleDropdown = () => {
+    dropDown.value =
+      dropDown.value === 0
+        ? withSpring(1, {damping: 20})
+        : withSpring(0, {damping: 20});
+  };
+
   return (
     <TouchableHighlight
+      key={index}
       underlayColor={'#ffffff11'}
       activeOpacity={0.4}
       onPress={onPress}
       style={[styles.container, isActive && styles.activeContainer]}>
       <>
-        <Image
-          source={
-            item.cover ? {uri: item.cover} : require('../../assets/tile.jpeg')
-          }
-          style={styles.image}
-        />
-        {isActive && (
-          <View style={styles.icon}>
-            {playing ? (
-              <LoaderKit
-                name="LineScaleParty"
-                color="#fff"
-                style={styles.loader}
-              />
-            ) : (
-              <Icon.PlayIcon size={23} color="#fff" />
-            )}
+        <View style={styles.row}>
+          <Image
+            source={
+              item.cover ? {uri: item.cover} : require('../../assets/tile.jpeg')
+            }
+            style={styles.image}
+          />
+          {isActive && (
+            <View style={styles.icon}>
+              {playing ? (
+                <LoaderKit
+                  name="LineScaleParty"
+                  color="#fff"
+                  style={styles.loader}
+                />
+              ) : (
+                <Icon.PlayIcon size={23} color="#fff" />
+              )}
+            </View>
+          )}
+          <View style={styles.infoContainer}>
+            <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
+              {item.title}
+            </Text>
+            <Text style={styles.artist} numberOfLines={1}>
+              {item.artist.slice(0, 30) + '...'} •{' '}
+              {convertMillisecondsToTime(item.duration)}
+            </Text>
           </View>
-        )}
-        <View style={styles.infoContainer}>
-          <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
-            {item.title}
-          </Text>
-          <Text style={styles.artist} numberOfLines={1}>
-            {item.artist.slice(0, 30) + '...'} •{' '}
-            {convertMillisecondsToTime(item.duration)}
-          </Text>
-        </View>
-        <TrackShortcutMenu track={item} itemUrl={item.url}>
-          <TouchableOpacity style={styles.moreButton}>
+          <TouchableOpacity onPress={toggleDropdown} style={styles.moreButton}>
             <Icon.EllipsisHorizontalIcon color="#fff" size={22} />
           </TouchableOpacity>
-        </TrackShortcutMenu>
+        </View>
+        <Animated.View style={[animatedStyles, styles.dropdownContainer]}>
+          <TouchableOpacity
+            onPress={() => console.log('Add to playlist')}
+            style={styles.dropdownItem}>
+            <Icon.PlusIcon size={22} color={'#fff'} />
+            <Text style={styles.dropdownText}>Add to playlist</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => console.log('Add to favourite')}
+            style={styles.dropdownItem}>
+            {isLiked(item.url) ? (
+              <IconSolid.HeartIcon size={22} color={'#fff'} />
+            ) : (
+              <Icon.HeartIcon size={22} color={'#fff'} />
+            )}
+            <Text style={styles.dropdownText}>Add to favourite</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </>
     </TouchableHighlight>
   );
@@ -104,14 +168,17 @@ export default ListView;
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    marginBottom: 12,
+    marginTop: 12,
     marginHorizontal: 8,
-    alignItems: 'center',
     borderRadius: 16,
+    zIndex: 0, // Ensure this is lower than the menu
   },
   activeContainer: {
     backgroundColor: 'rgba(255, 0, 0, 0.4)',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   image: {
     width: 65,
@@ -146,9 +213,23 @@ const styles = StyleSheet.create({
   },
   moreButton: {
     padding: 4,
-    zIndex: 20,
     marginHorizontal: 2,
     backgroundColor: 'rgba(255, 255, 255, 0.13)',
     borderRadius: 20,
+  },
+  dropdownContainer: {
+    overflow: 'hidden',
+    justifyContent: 'space-evenly',
+    flexDirection: 'row',
+    borderRadius: 10,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+  },
+  dropdownText: {
+    color: '#fff',
+    marginLeft: 5,
   },
 });

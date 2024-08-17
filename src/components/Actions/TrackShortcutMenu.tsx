@@ -1,7 +1,8 @@
-import {View, Text, Platform} from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
 import React from 'react';
-import {MenuView} from '@react-native-menu/menu';
 import {useMMKVObject} from 'react-native-mmkv';
+import * as Icon from 'react-native-heroicons/outline';
+import Animated from 'react-native-reanimated';
 import {MusicFile} from '../ListView';
 import {Storage} from '../../constants/Store';
 
@@ -11,7 +12,7 @@ type Props = {
   children: any;
 };
 
-const TrackShortcutMenu = ({itemUrl, track, children}: Props) => {
+const TrackShortcutMenu = ({children, itemUrl, track}: Props) => {
   const [like, setLike] = useMMKVObject<MusicFile[]>('liked', Storage);
 
   const isLiked = (itemUrl: string) =>
@@ -35,42 +36,43 @@ const TrackShortcutMenu = ({itemUrl, track, children}: Props) => {
       console.log('add to playlist');
     }
     if (id === 'add-to-favourite') {
-      ToggleLike(track);
+      // ToggleLike(track);
     }
   };
 
+  const viewStyle = 'space-x-2 flex-row items-center';
   return (
-    <MenuView
-      onPressAction={({nativeEvent: {event}}) => handlePresses(event)}
-      isAnchoredToRight={true}
-      actions={[
-        {
-          id: 'add-to-playlist',
-          title: 'Add to playlist',
-          image: Platform.select({
-            ios: 'plus',
-            android: 'ic_menu_add',
-          }),
-          imageColor: '#fff',
-          titleColor: '#fff',
-          displayInline: true,
-        },
-        {
-          id: 'add-to-favourite',
-          title: isLiked(itemUrl)
-            ? 'Remove from favourite'
-            : 'Add to favourite',
-          image: Platform.select({
-            android: isLiked(itemUrl) ? 'ic_favorite' : 'ic_favorite_border',
-            ios: isLiked(itemUrl) ? 'heart.fill' : 'heart',
-          }),
-          imageColor: '#e74444',
-          titleColor: '#fff',
-          displayInline: true,
-        },
-      ]}>
+    <View style={{zIndex: 50}}>
+      <Animated.View
+        style={{
+          position: 'absolute',
+          zIndex: 50,
+          top: 10,
+          right: 10,
+          width: 150,
+          backgroundColor: 'rgba(255, 0, 0, 0.8)',
+          borderRadius: 10,
+          padding: 10,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            console.log('Hell');
+          }}
+          className={viewStyle}>
+          <Icon.PlusIcon size={23} color={'#fff'} />
+          <Text style={{color: '#fff', marginLeft: 5}}>Add to playlist</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            console.log('Hell');
+          }}
+          className={viewStyle}>
+          <Icon.PlusIcon size={23} color={'#fff'} />
+          <Text style={{color: '#fff', marginLeft: 5}}>Add to playlist</Text>
+        </TouchableOpacity>
+      </Animated.View>
       {children}
-    </MenuView>
+    </View>
   );
 };
 

@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from 'react-native';
 import React, {useEffect} from 'react';
 import * as Icon from 'react-native-heroicons/solid';
@@ -68,11 +69,21 @@ const Album = ({navigation}: any) => {
             activeOpacity={0.7}
             key={artistKey}
             className="flex-row items-center ">
-            <Icon.UserIcon
-              color={'#fff'}
-              size={50}
-              className="mr-4 rounded-full bg-[#1F1F1F]"
-            />
+            {songs[0].cover ? (
+              <Image
+                source={
+                  {uri: songs[0].cover}
+                  // : require('../../assets/tile.jpeg')
+                }
+                style={styles.image}
+              />
+            ) : (
+              <Icon.UserIcon
+                color={'#fff'}
+                size={50}
+                className="mr-4 rounded-full bg-[#1F1F1F]"
+              />
+            )}
             <Text className="w-4/5 text-white font-semibold tracking-wide">
               {artistKey}
             </Text>
@@ -89,6 +100,12 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 10,
     marginTop: 10,
+  },
+  image: {
+    width: 55,
+    height: 55,
+    borderRadius: 30,
+    marginRight: 16,
   },
 });
 

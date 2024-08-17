@@ -9,7 +9,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {PlayAll, ShuffleQueue} from './QueueControls';
 import {MusicFile} from './ListView';
 
 type ContainerProps = {
@@ -19,7 +18,7 @@ type ContainerProps = {
   track?: MusicFile[] | string;
 };
 
-const HeaderSearchBar = ({search, setSearch, title, track}: ContainerProps) => {
+const HeaderSearchBar = ({search, setSearch, title}: ContainerProps) => {
   const searchVal = useSharedValue(0);
   const ATouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -63,19 +62,14 @@ const HeaderSearchBar = ({search, setSearch, title, track}: ContainerProps) => {
   };
 
   return (
-    <View className="px-2.5">
+    <View className="px-2.5 mx-[10px]">
       <View className="flex-row justify-between z-10 items-center">
         <Text className="font-semibold text-3xl items-center text-white tracking-wide">
           {title}
         </Text>
-        {/* <View className="flex-row items-center justify-between w-20"> */}
-        {/* <TouchableOpacity onPress={() => buttonCol()}>
-            <Icon.ChevronDownIcon size={23} strokeWidth={2} color={'#fff'} />
-          </TouchableOpacity> */}
         <TouchableOpacity onPress={searchValue}>
           <Icon.MagnifyingGlassIcon size={23} strokeWidth={2} color={'#fff'} />
         </TouchableOpacity>
-        {/* </View> */}
       </View>
       <Animated.View
         style={animatedSearchStyle}

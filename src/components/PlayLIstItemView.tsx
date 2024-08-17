@@ -2,6 +2,7 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import * as Icon from 'react-native-heroicons/outline';
 import {MusicFile} from './ListView';
+import {useNavigation} from '@react-navigation/native';
 
 interface ItemProps {
   item: {
@@ -12,8 +13,13 @@ interface ItemProps {
 }
 
 const PlayLIstItemView = ({item, index}: ItemProps) => {
+  const nav: any = useNavigation();
   return (
-    <TouchableOpacity key={index} activeOpacity={0.8} style={styles.container}>
+    <TouchableOpacity
+      onPress={() => nav.navigate('PlaylistSongs', {item})}
+      key={index}
+      activeOpacity={0.8}
+      style={styles.container}>
       <Image
         style={styles.image}
         source={require('../../assets/playlist.jpeg')}

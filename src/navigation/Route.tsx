@@ -12,6 +12,7 @@ import {Storage} from '../constants/Store';
 import FloatingScreen from '../app/floatingscreen';
 import * as Icon from 'react-native-heroicons/outline';
 import ArtistsSongs from '../app/artistsSongs';
+import PlaylistSongs from '../app/playlistSongs';
 
 const Route = () => {
   const [music, setMusic] = useMMKVObject<string | MusicFile[]>(
@@ -115,6 +116,31 @@ const Route = () => {
         <Stack.Screen
           name="ArtistSongs"
           component={ArtistsSongs}
+          options={({navigation}) => ({
+            headerTitleStyle: {
+              fontSize: 18,
+              fontWeight: '500',
+            },
+            headerTitleAlign: 'center',
+            presentation: 'fullScreenModal',
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.pop();
+                }}
+                className="p-2 rounded-full bg-[#ffffff21]">
+                <Icon.ChevronDownIcon
+                  size={23}
+                  color={'#fff'}
+                  strokeWidth={2}
+                />
+              </TouchableOpacity>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="PlaylistSongs"
+          component={PlaylistSongs}
           options={({navigation}) => ({
             headerTitleStyle: {
               fontSize: 18,

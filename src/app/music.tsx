@@ -1,11 +1,12 @@
 import {
+  ActivityIndicator,
   FlatList,
   PermissionsAndroid,
   Platform,
-  ScrollView,
   Text,
   ToastAndroid,
   View,
+  RefreshControl,
 } from 'react-native';
 import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
 import {useMMKVObject, useMMKVString} from 'react-native-mmkv';
@@ -20,6 +21,7 @@ import ListView, {MusicFile} from '../components/ListView';
 import HeaderSearchBar from '../components/HeaderSearchBar';
 import LoadingTrack from '../components/loading';
 import {handleTrackPlayerSong} from '../utility/handleTrackChange';
+import TrackPlayer from 'react-native-track-player';
 
 const Main = () => {
   const id = 'songs';
@@ -31,14 +33,17 @@ const Main = () => {
     Storage,
   );
   const musicArray = Array.isArray(music) ? music : [];
+
   const filteredMusic = musicArray.filter(
     (item: MusicFile) =>
       item.title.toLowerCase().includes(search.toLowerCase()) ||
       item.artist.toLowerCase().includes(search.toLowerCase()),
   );
+
   const queueOffset = useRef(0);
 
   const fetchMusicList = async () => {
+    setLoading(true);
     try {
       const files = await getAll({
         limit: 500,
@@ -51,6 +56,8 @@ const Main = () => {
       setMusic(files);
     } catch (error) {
       console.error('Error while fetching music list:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,41 +115,56 @@ const Main = () => {
     [id, musicArray, queueId, setQueueId, queueOffset],
   );
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchMusicList().finally(() => setRefreshing(false));
+    TrackPlayer.add(musicArray);
+  }, []);
+
   return (
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
-
+      <HeaderSearchBar
+        title={'Songs'}
+        search={search}
+        setSearch={setSearch}
+        track={musicArray}
+      />
       <FlatList
-        ListHeaderComponent={() => (
-          <HeaderSearchBar
-            title={'Songs'}
-            search={search}
-            setSearch={setSearch}
-            track={musicArray}
+        data={filteredMusic}
+        keyExtractor={(item: MusicFile) => item?.url} // Ensure item.id is unique
+        renderItem={({item, index}) => (
+          <ListView
+            key={item.url}
+            index={index}
+            item={item}
+            handleTrack={onHandleTrackPlayerSong}
           />
         )}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         ListEmptyComponent={() => (
-          <View className="justify-center items-center my-5">
-            <Text className="text-base font-semibold text-white">
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginVertical: 5,
+            }}>
+            <Text style={{fontSize: 16, fontWeight: 'bold', color: '#fff'}}>
               Song not found
             </Text>
           </View>
         )}
+        maxToRenderPerBatch={20}
         decelerationRate={0.7}
         scrollEventThrottle={17}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,
         }}
-        data={filteredMusic}
-        renderItem={({item, index}) => (
-          <ListView
-            key={index}
-            index={index}
-            item={item}
-            handleTrack={onHandleTrackPlayerSong}
-          />
-        )}
       />
     </View>
   );
