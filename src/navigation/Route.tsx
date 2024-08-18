@@ -168,4 +168,4 @@ const Route = () => {
   );
 };
 
-export default Route;
+export default memo(Route);

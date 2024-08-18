@@ -7,7 +7,7 @@ import {
   View,
   RefreshControl,
 } from 'react-native';
-import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
+import React, {memo, useCallback, useEffect, useState} from 'react';
 import {useMMKVObject, useMMKVString} from 'react-native-mmkv';
 import {Storage} from '../constants/Store';
 
@@ -155,6 +155,7 @@ const Main = () => {
             </Text>
           </View>
         )}
+        showsVerticalScrollIndicator={false}
         maxToRenderPerBatch={10}
         maintainVisibleContentPosition={{
           autoscrollToTopThreshold: 10,

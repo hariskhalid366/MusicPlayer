@@ -1,8 +1,10 @@
 import React, {memo} from 'react';
 import Main from '../app/music';
 import * as Icon from 'react-native-heroicons/outline';
-import {Text} from 'react-native';
+import {Text, View} from 'react-native';
 import Album from '../app/album';
+import LoaderKit from 'react-native-loader-kit';
+
 import Favourite from '../app/favourite';
 import Playlist from '../app/playlist';
 import FloatingTrack from '../components/FloatingTrack';
@@ -30,6 +32,15 @@ const BottomTabs = () => {
           swipeEnabled: false,
           animationEnabled: true,
           lazy: true,
+          lazyPlaceholder: () => (
+            <View className="flex-1 justify-center items-center">
+              <LoaderKit
+                name="LineSpinFadeLoader"
+                color="#fff"
+                style={{width: 40, height: 40}}
+              />
+            </View>
+          ),
         })}>
         <Tab.Screen
           name="Songs"

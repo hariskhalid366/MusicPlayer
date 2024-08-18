@@ -165,11 +165,16 @@ const ListView = ({item, index, handleTrack, playlist}: ListItemProps) => {
             onPress={() => ToggleLike(item)}
             style={styles.dropdownItem}>
             {isLiked(item.url) ? (
-              <IconSolid.HeartIcon size={22} color={'#fff'} />
+              <>
+                <IconSolid.HeartIcon size={22} color={'#fff'} />
+                <Text style={styles.dropdownText}>Remove from favourite</Text>
+              </>
             ) : (
-              <Icon.HeartIcon size={22} color={'#fff'} />
+              <>
+                <Icon.HeartIcon size={22} color={'#fff'} />
+                <Text style={styles.dropdownText}>Add to favourite</Text>
+              </>
             )}
-            <Text style={styles.dropdownText}>Add to favourite</Text>
           </TouchableOpacity>
         </Animated.View>
       </>
@@ -177,7 +182,7 @@ const ListView = ({item, index, handleTrack, playlist}: ListItemProps) => {
   );
 };
 
-export default memo(ListView);
+export default ListView;
 
 const styles = StyleSheet.create({
   container: {

@@ -24,7 +24,7 @@ export const handleTrackPlayerSong = async (
       setLoading(true);
 
       await TrackPlayer.reset(),
-        await TrackPlayer.add(songs),
+        await TrackPlayer.setQueue(songs),
         await TrackPlayer.skip(trackIndex),
         setLoading(false);
 

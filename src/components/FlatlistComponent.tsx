@@ -1,4 +1,4 @@
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
 import React, {memo, useCallback} from 'react';
 import ListView, {MusicFile} from './ListView';
 import {handleTrackPlayerSong} from '../utility/handleTrackChange';
@@ -9,6 +9,7 @@ interface FlatlistItemProps {
   queueId: string | undefined;
   setLoading: (value: boolean) => void;
   setQueueId: (text: string) => void;
+  ListHeaderComponent?: React.ReactElement | null; // Optional header component
 }
 
 const FlatlistComponent = ({
@@ -17,6 +18,7 @@ const FlatlistComponent = ({
   queueId,
   setLoading,
   setQueueId,
+  ListHeaderComponent, // Destructure the optional header component
 }: FlatlistItemProps) => {
   const onHandleTrackPlayerSong = useCallback(
     async (selectedTrack: MusicFile) => {
@@ -31,19 +33,30 @@ const FlatlistComponent = ({
     },
     [id, items, queueId, setQueueId],
   );
+
+  // Combine the header component with the list data if the header is provided
+  const combinedData = ListHeaderComponent ? [{header: true}, ...items] : items;
+
   return (
     <FlatList
-      data={items}
-      keyExtractor={(item: MusicFile) => item?.url} // Ensure item.id is unique
-      renderItem={({item, index}) => (
-        <ListView
-          key={item.url}
-          index={index}
-          item={item}
-          playlist={true}
-          handleTrack={onHandleTrackPlayerSong}
-        />
-      )}
+      data={combinedData}
+      keyExtractor={(item: any, index) =>
+        item?.url ? item.url : `header-${index}`
+      }
+      renderItem={({item, index}) =>
+        item.header && ListHeaderComponent ? (
+          <View>{ListHeaderComponent}</View> // Wrap the header in a View
+        ) : (
+          <ListView
+            key={item.url}
+            index={index}
+            item={item}
+            playlist={true}
+            handleTrack={onHandleTrackPlayerSong}
+          />
+        )
+      }
+      stickyHeaderIndices={ListHeaderComponent ? [0] : undefined} // Make the first index sticky if there's a header
       ListEmptyComponent={() => (
         <View
           style={{
@@ -73,5 +86,3 @@ const FlatlistComponent = ({
 };
 
 export default memo(FlatlistComponent);
-
-const styles = StyleSheet.create({});

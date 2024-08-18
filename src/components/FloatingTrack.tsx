@@ -1,4 +1,4 @@
-import React, {memo} from 'react';
+import React from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useActiveTrack} from 'react-native-track-player';
 import PlayPause, {Forward, MusicSlider} from './PlayerControls';
@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 1,
+    height: 66,
     marginHorizontal: 3,
     borderRadius: 15,
     backgroundColor: 'rgba(255, 0, 0, 0.7)',
@@ -78,4 +79,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(FloatingTrack);
+export default FloatingTrack;

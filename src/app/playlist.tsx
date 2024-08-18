@@ -1,10 +1,6 @@
 import {
-  Modal,
-  Pressable,
   ScrollView,
-  StyleSheet,
   Text,
-  TextInput,
   ToastAndroid,
   TouchableOpacity,
   View,
@@ -16,6 +12,7 @@ import {Storage} from '../constants/Store';
 import {MusicFile} from '../components/ListView';
 import PlayLIstItemView from '../components/PlayLIstItemView';
 import PlaylistModal from '../components/modal/PlaylistModal';
+import Header from '../components/Header';
 
 export interface PlaylistProps {
   id: string;
@@ -84,19 +81,21 @@ const Playlist = () => {
       {validPlaylistSongs.length > 0 && (
         <TouchableOpacity
           onPress={() => setModal(true)}
-          className="absolute rounded-2xl z-10 bottom-[140px] bg-white right-3 gap-x-1 p-2 flex-row">
+          className="absolute rounded-2xl z-10 bottom-16 bg-white right-3 gap-x-1 p-2 flex-row">
           <Icon.PlusIcon strokeWidth={3} color={'#000'} size={20} />
           <Text className="text-sm text-black font-bold">Add Playlist</Text>
         </TouchableOpacity>
       )}
       {validPlaylistSongs.length > 0 ? (
         <ScrollView
+          stickyHeaderIndices={[0]}
           decelerationRate={0.6}
           scrollEventThrottle={16}
           contentContainerStyle={{
             paddingHorizontal: 10,
             paddingBottom: 150,
           }}>
+          <Header title="Playlist" />
           {validPlaylistSongs?.map((item, index) => (
             <PlayLIstItemView key={index} {...{index, item, deletePlaylist}} />
           ))}
@@ -117,5 +116,3 @@ const Playlist = () => {
 };
 
 export default Playlist;
-
-const styles = StyleSheet.create({});

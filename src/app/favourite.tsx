@@ -1,11 +1,11 @@
-import {FlatList, ScrollView, View} from 'react-native';
-import React, {memo, useRef, useState} from 'react';
-import ListView, {MusicFile} from '../components/ListView';
+import {View} from 'react-native';
+import React, {memo, useState} from 'react';
+import {MusicFile} from '../components/ListView';
 import {Storage} from '../constants/Store';
 import {useMMKVObject, useMMKVString} from 'react-native-mmkv';
 import LoadingTrack from '../components/loading';
-import {handleTrackPlayerSong} from '../utility/handleTrackChange';
 import FlatlistComponent from '../components/FlatlistComponent';
+import Header from '../components/Header';
 
 const Favourite = () => {
   const id = 'favourite';
@@ -18,6 +18,7 @@ const Favourite = () => {
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
       <FlatlistComponent
+        ListHeaderComponent={<Header title="Favourite" />}
         items={musicArray}
         id={id}
         queueId={queueId}

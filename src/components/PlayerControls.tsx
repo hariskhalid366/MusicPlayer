@@ -71,7 +71,7 @@ const PlayPause = ({size, color}: IconProps) => {
   );
 };
 
-export default memo(PlayPause);
+export default PlayPause;
 
 export const MusicSlider = ({style}: SliderStyleProps) => {
   const {position, duration} = useProgress();
