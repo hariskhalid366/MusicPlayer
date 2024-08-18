@@ -1,9 +1,14 @@
 import {useEffect, useRef} from 'react';
-import TrackPlayer, {RepeatMode} from 'react-native-track-player';
+import TrackPlayer, {
+  AndroidAudioContentType,
+  RepeatMode,
+} from 'react-native-track-player';
 
 const setupTrack = async () => {
   await TrackPlayer.setupPlayer({
-    maxCacheSize: 1024 * 50,
+    maxCacheSize: 1024 * 10,
+    androidAudioContentType: AndroidAudioContentType.Sonification,
+    backBuffer: 2.5,
   });
   await TrackPlayer.setRepeatMode(RepeatMode.Queue);
 };

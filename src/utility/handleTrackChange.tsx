@@ -2,42 +2,38 @@ import TrackPlayer from 'react-native-track-player';
 import {MusicFile} from '../components/ListView';
 
 export const handleTrackPlayerSong = async (
-  selectedTrack: any,
+  selectedTrack: MusicFile,
   songs: MusicFile[],
   id: string,
   queueId: string | undefined,
   setQueueId: (id: string) => void,
-  queueOffset: number,
   setLoading: (loading: boolean) => void,
 ) => {
-  const trackIndex = songs?.findIndex(track => track.url === selectedTrack.url);
+  try {
+    const trackIndex = songs?.findIndex(
+      track => track.url === selectedTrack.url,
+    );
 
-  queueOffset = trackIndex;
-  if (trackIndex === -1) return;
+    if (trackIndex === -1) {
+      return;
+    }
 
-  const isChangingQueue = id !== queueId;
+    const isChangingQueue = id !== queueId;
 
-  if (isChangingQueue) {
-    setLoading(true);
-    await TrackPlayer.reset();
+    if (isChangingQueue) {
+      setLoading(true);
 
-    const newTrackQueue = [
-      ...songs.slice(0, trackIndex),
-      selectedTrack,
-      ...songs.slice(trackIndex + 1),
-    ];
+      await TrackPlayer.reset(),
+        await TrackPlayer.add(songs),
+        await TrackPlayer.skip(trackIndex),
+        setLoading(false);
 
-    await TrackPlayer.add(newTrackQueue);
-
-    await TrackPlayer.skip(trackIndex);
+      setQueueId(id);
+    } else {
+      await TrackPlayer.skip(trackIndex);
+    }
     await TrackPlayer.play();
-
-    setLoading(false);
-    queueOffset = trackIndex;
-
-    setQueueId(id);
-  } else {
-    await TrackPlayer.skip(trackIndex);
-    await TrackPlayer.play();
+  } catch (error) {
+    console.error('Error handling track change:', error);
   }
 };

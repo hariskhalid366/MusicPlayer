@@ -5,56 +5,24 @@ import {Storage} from '../constants/Store';
 import {useMMKVObject, useMMKVString} from 'react-native-mmkv';
 import LoadingTrack from '../components/loading';
 import {handleTrackPlayerSong} from '../utility/handleTrackChange';
+import FlatlistComponent from '../components/FlatlistComponent';
 
 const Favourite = () => {
   const id = 'favourite';
-  const queueOffset = useRef(0);
   const [loading, setLoading] = useState(false);
-  const [scroll, setScroll] = useState<boolean>(false);
   const [queueId, setQueueId] = useMMKVString('queueId', Storage);
   const [like, setLike] = useMMKVObject<MusicFile[]>('liked', Storage);
-  const [search, setSearch] = useState('');
   const musicArray = Array.isArray(like) ? like : [];
-  const filteredMusic = musicArray.filter(
-    (item: MusicFile) =>
-      item.title.toLowerCase().includes(search.toLowerCase()) ||
-      item.artist.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  const onHandleTrackPlayerSong = async (selectedTrack: MusicFile) => {
-    await handleTrackPlayerSong(
-      selectedTrack,
-      musicArray,
-      id,
-      queueId,
-      setQueueId,
-      queueOffset.current,
-      setLoading,
-    );
-  };
 
   return (
     <View style={{flex: 1, backgroundColor: '#000'}}>
       {loading && <LoadingTrack />}
-      <FlatList
-        onScroll={() => setScroll(true)}
-        maxToRenderPerBatch={10}
-        decelerationRate={0.6}
-        scrollEventThrottle={16}
-        contentContainerStyle={{
-          paddingHorizontal: 10,
-          paddingBottom: 150,
-        }}
-        data={filteredMusic}
-        renderItem={({item, index}) => (
-          <ListView
-            scroll={scroll}
-            key={index}
-            index={index}
-            item={item}
-            handleTrack={onHandleTrackPlayerSong}
-          />
-        )}
+      <FlatlistComponent
+        items={musicArray}
+        id={id}
+        queueId={queueId}
+        setLoading={setLoading}
+        setQueueId={setQueueId}
       />
     </View>
   );

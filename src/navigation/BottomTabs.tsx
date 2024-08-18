@@ -1,21 +1,21 @@
-import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import React, {memo} from 'react';
 import Main from '../app/music';
 import * as Icon from 'react-native-heroicons/outline';
-import {StyleSheet, Text} from 'react-native';
-import {BlurView} from '@react-native-community/blur';
+import {Text} from 'react-native';
 import Album from '../app/album';
 import Favourite from '../app/favourite';
 import Playlist from '../app/playlist';
 import FloatingTrack from '../components/FloatingTrack';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 const BottomTabs = () => {
-  const Tab = createBottomTabNavigator();
+  const Tab = createMaterialTopTabNavigator();
   return (
     <>
       <Tab.Navigator
         sceneContainerStyle={{backgroundColor: '#000'}}
         initialRouteName="Songs"
+        tabBarPosition="bottom"
         screenOptions={({route}) => ({
           tabBarLabel: ({focused}) => (
             <Text
@@ -27,33 +27,14 @@ const BottomTabs = () => {
               {route.name}
             </Text>
           ),
-
-          tabBarBackground: () => (
-            <BlurView
-              overlayColor="transparent"
-              blurAmount={90}
-              blurType="light"
-              style={[StyleSheet.absoluteFill, {backgroundColor: '#00000099'}]}
-            />
-          ),
-          headerTitleAlign: 'center',
-          headerShadowVisible: false,
-          headerTitleStyle: {
-            fontSize: 25,
-            fontWeight: '600',
-          },
-          tabBarStyle: {
-            position: 'absolute',
-            bottom: 0,
-            height: 60,
-            paddingBottom: 6,
-          },
+          swipeEnabled: false,
+          animationEnabled: true,
+          lazy: true,
         })}>
         <Tab.Screen
           name="Songs"
           component={Main}
           options={{
-            headerShown: false,
             tabBarIcon: ({focused}) => (
               <Icon.MusicalNoteIcon
                 color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
@@ -109,4 +90,4 @@ const BottomTabs = () => {
   );
 };
 
-export default BottomTabs;
+export default memo(BottomTabs);

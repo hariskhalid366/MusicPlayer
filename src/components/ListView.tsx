@@ -38,7 +38,7 @@ interface ListItemProps {
   item: MusicFile;
   index: number;
   handleTrack: (track: MusicFile) => void;
-  scroll: boolean;
+  playlist?: boolean;
 }
 
 export const convertMillisecondsToTime = (milliseconds: number) => {
@@ -49,7 +49,7 @@ export const convertMillisecondsToTime = (milliseconds: number) => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-const ListView = ({item, scroll, index, handleTrack}: ListItemProps) => {
+const ListView = ({item, index, handleTrack, playlist}: ListItemProps) => {
   const activeTrack = useActiveTrack();
   const isActive = activeTrack?.url === item?.url;
   const {playing} = useIsPlaying();
@@ -150,15 +150,17 @@ const ListView = ({item, scroll, index, handleTrack}: ListItemProps) => {
           </TouchableOpacity>
         </View>
         <Animated.View style={[animatedStyles, styles.dropdownContainer]}>
-          <TouchableOpacity
-            onPress={() => {
-              setIsVisible(true);
-              setCurrentTrack(item);
-            }}
-            style={styles.dropdownItem}>
-            <Icon.PlusIcon size={22} color={'#fff'} />
-            <Text style={styles.dropdownText}>Add to playlist</Text>
-          </TouchableOpacity>
+          {!playlist ? (
+            <TouchableOpacity
+              onPress={() => {
+                setIsVisible(true);
+                setCurrentTrack(item);
+              }}
+              style={styles.dropdownItem}>
+              <Icon.PlusIcon size={22} color={'#fff'} />
+              <Text style={styles.dropdownText}>Add to playlist</Text>
+            </TouchableOpacity>
+          ) : null}
           <TouchableOpacity
             onPress={() => ToggleLike(item)}
             style={styles.dropdownItem}>

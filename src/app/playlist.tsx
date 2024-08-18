@@ -64,18 +64,6 @@ const Playlist = () => {
   };
 
   const deletePlaylist = (playlistName: string) => {
-    const playlistExist = playlistSongs?.some(playlist => {
-      playlist.id === playlistName.trim();
-    });
-    if (!playlistExist) {
-      ToastAndroid.showWithGravity(
-        'No playlist exists of name' + `${playlistName}`,
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
-      return;
-    }
-
     const updatePlaylist = playlistSongs?.filter(
       playlist => playlist.id !== playlistName,
     );
@@ -110,7 +98,7 @@ const Playlist = () => {
             paddingBottom: 150,
           }}>
           {validPlaylistSongs?.map((item, index) => (
-            <PlayLIstItemView key={index} {...{index, item}} />
+            <PlayLIstItemView key={index} {...{index, item, deletePlaylist}} />
           ))}
         </ScrollView>
       ) : (
@@ -123,7 +111,6 @@ const Playlist = () => {
           </Text>
         </TouchableOpacity>
       )}
-
       <PlaylistModal {...{modal, setModal, text, setText, createPlaylist}} />
     </View>
   );

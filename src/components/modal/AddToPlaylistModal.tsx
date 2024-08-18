@@ -6,20 +6,15 @@ import {
   ScrollView,
   StyleSheet,
   Image,
+  ToastAndroid,
 } from 'react-native';
 import React from 'react';
 import * as Icon from 'react-native-heroicons/solid';
 import {useMMKVObject} from 'react-native-mmkv';
 import {Storage} from '../../constants/Store';
 import {PlaylistProps} from '../../app/playlist';
-import PlayLIstItemView from '../PlayLIstItemView';
 import {useGlobalState} from '../../constants/PlaylistContextState';
 import {MusicFile} from '../ListView';
-
-interface itemProps {
-  id: string;
-  item: MusicFile;
-}
 
 const AddSongModal = () => {
   const [playlistSongs, setPlaylistSongs] =
@@ -30,8 +25,38 @@ const AddSongModal = () => {
 
   const validPlaylistSongs = playlistSongs || [];
 
-  const addSongToPlaylist = ({id, item}: itemProps) => {
-    const playlistItem = playlistSongs?.some(playlist => playlist.id === id);
+  const addSongToPlaylist = (playlistId: string, song: MusicFile) => {
+    const updatedPlaylists = playlistSongs?.map(playlist => {
+      if (playlist.id === playlistId) {
+        const songExists = playlist.songs.some(
+          existingSong => existingSong.url === song.url,
+        );
+
+        if (songExists) {
+          ToastAndroid.showWithGravity(
+            'Song already exists in the playlist',
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+          return playlist;
+        }
+
+        // Add the selected song to the playlist's songs array
+        return {
+          ...playlist,
+          songs: [...playlist.songs, song],
+        };
+      }
+
+      return playlist;
+    });
+
+    setPlaylistSongs(updatedPlaylists);
+    ToastAndroid.showWithGravity(
+      'Song added to playlist',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER,
+    );
   };
 
   return (
@@ -44,7 +69,7 @@ const AddSongModal = () => {
         <View className="bg-black w-full rounded-t-3xl">
           <TouchableOpacity
             onPress={() => {
-              setIsVisible(!isVisible);
+              setIsVisible(false);
               setCurrentTrack(null);
             }}
             style={styles.touchable}>
@@ -56,9 +81,14 @@ const AddSongModal = () => {
             contentContainerStyle={{
               paddingHorizontal: 10,
             }}>
-            {validPlaylistSongs?.map((item, index) => (
+            {validPlaylistSongs.map((item, index) => (
               <TouchableOpacity
-                onPress={() => console.log(item.id)}
+                onPress={() => {
+                  if (currentTrack) {
+                    addSongToPlaylist(item.id, currentTrack);
+                  }
+                  setIsVisible(false);
+                }}
                 key={index}
                 activeOpacity={0.8}
                 style={styles.container}>
@@ -66,7 +96,6 @@ const AddSongModal = () => {
                   style={styles.image}
                   source={require('../../../assets/playlist.jpeg')}
                 />
-
                 <View style={styles.infoContainer}>
                   <Text
                     style={styles.title}
@@ -75,7 +104,7 @@ const AddSongModal = () => {
                     {item.id}
                   </Text>
                   <Text style={styles.artist} numberOfLines={1}>
-                    {item.songs.length}
+                    {item.songs.length} songs
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -108,15 +137,6 @@ const styles = StyleSheet.create({
   image: {
     width: 50,
     height: 50,
-    borderRadius: 15,
-  },
-  icon: {
-    position: 'absolute',
-    backgroundColor: 'rgba(0, 0, 0, 0.53)',
-    width: 65,
-    height: 65,
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 15,
   },
   infoContainer: {

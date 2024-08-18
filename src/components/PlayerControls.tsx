@@ -34,7 +34,6 @@ const ControlButton = memo(({onPress, IconComponent, size, color}: any) => (
 export const Forward = ({size, color}: IconProps) => (
   <ControlButton
     onPress={async () => {
-      await TrackPlayer.pause();
       await TrackPlayer.skipToNext();
       await TrackPlayer.play();
     }}
@@ -47,7 +46,6 @@ export const Forward = ({size, color}: IconProps) => (
 export const Backward = ({size, color}: IconProps) => (
   <ControlButton
     onPress={async () => {
-      await TrackPlayer.pause();
       await TrackPlayer.skipToPrevious();
       await TrackPlayer.play();
     }}

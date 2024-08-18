@@ -40,8 +40,6 @@ const Main = () => {
       item.artist.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const queueOffset = useRef(0);
-
   const fetchMusicList = async () => {
     setLoading(true);
     try {
@@ -108,15 +106,13 @@ const Main = () => {
         id,
         queueId,
         setQueueId,
-        queueOffset.current,
         setLoading,
       );
     },
-    [id, musicArray, queueId, setQueueId, queueOffset],
+    [id, musicArray, queueId, setQueueId],
   );
 
   const [refreshing, setRefreshing] = useState(false);
-  const [scroll, setScroll] = useState<boolean>(false);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -141,7 +137,6 @@ const Main = () => {
             key={item.url}
             index={index}
             item={item}
-            scroll={scroll}
             handleTrack={onHandleTrackPlayerSong}
           />
         )}
@@ -160,8 +155,11 @@ const Main = () => {
             </Text>
           </View>
         )}
-        onScroll={() => setScroll(true)}
         maxToRenderPerBatch={10}
+        maintainVisibleContentPosition={{
+          autoscrollToTopThreshold: 10,
+          minIndexForVisible: 20,
+        }}
         decelerationRate={0.6}
         scrollEventThrottle={16}
         contentContainerStyle={{
