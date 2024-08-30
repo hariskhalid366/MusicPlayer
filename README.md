@@ -35,5 +35,5 @@ This is a fully-featured Music Player application built using React Native CLI. 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/hariskhalid366/MusicPlayer.git
+   git@github.com:hariskhalid366/neact-native-musicplayer.git
    ```
