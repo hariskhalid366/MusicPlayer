@@ -8,12 +8,12 @@
     "lint": "eslint .",
     "start": "clear && react-native start --reset-cache",
     "test": "jest",
+    "build": "cd android/ && ./gradlew assembleRelease",
     "clean": "cd android/ && ./gradlew clean && cd ..",
     "splashscreen": "yarn react-native generate-bootsplash assets/logo.png   --platforms=android,ios,web   --background=000000   --logo-width=120   --assets-output=assets/bootsplash   --flavor=main   --html=public/index.html"
   },
   "dependencies": {
     "@react-native-community/slider": "^4.5.2",
-    "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/material-top-tabs": "^6.6.14",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",

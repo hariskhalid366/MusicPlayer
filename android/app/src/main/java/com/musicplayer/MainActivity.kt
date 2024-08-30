@@ -12,6 +12,11 @@ class MainActivity : ReactActivity() {
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
    * rendering of the component.
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        RNBootSplash.init(R.drawable.bootsplash, this) // Initialize the splash screen
+        setContentView(R.layout.bootsplash) // Use the custom layout
+    }
    */
   override fun getMainComponentName(): String = "MusicPlayer"
 

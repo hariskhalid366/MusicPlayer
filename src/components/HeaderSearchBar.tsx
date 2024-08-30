@@ -26,7 +26,7 @@ const HeaderSearchBar = ({search, setSearch, title}: ContainerProps) => {
     const height = interpolate(
       searchVal.value,
       [0, 1],
-      [1, 45],
+      [0, 45],
       Extrapolation.CLAMP,
     );
 
@@ -63,7 +63,7 @@ const HeaderSearchBar = ({search, setSearch, title}: ContainerProps) => {
 
   return (
     <View className="px-2.5 mx-[10px]">
-      <View className="flex-row justify-between z-10 items-center">
+      <View className="flex-row justify-between h-[60px] z-10 items-center">
         <Text className="font-semibold text-3xl items-center text-white tracking-wide">
           {title}
         </Text>
@@ -79,7 +79,8 @@ const HeaderSearchBar = ({search, setSearch, title}: ContainerProps) => {
           onChangeText={e => setSearch(e)}
           placeholder="Search songs"
           placeholderTextColor={'#ffffff99'}
-          className="flex-1 text-[15px] text-white"
+          style={{color: '#fff'}}
+          className="flex-1 text-[15px]"
         />
 
         <ATouchableOpacity

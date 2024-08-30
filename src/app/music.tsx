@@ -6,11 +6,13 @@ import {
   ToastAndroid,
   View,
   RefreshControl,
+  TouchableOpacity,
+  useWindowDimensions,
+  Dimensions,
 } from 'react-native';
 import React, {memo, useCallback, useEffect, useState} from 'react';
 import {useMMKVObject, useMMKVString} from 'react-native-mmkv';
 import {Storage} from '../constants/Store';
-
 import {
   getAll,
   SortSongFields,
@@ -20,10 +22,10 @@ import ListView, {MusicFile} from '../components/ListView';
 import HeaderSearchBar from '../components/HeaderSearchBar';
 import LoadingTrack from '../components/loading';
 import {handleTrackPlayerSong} from '../utility/handleTrackChange';
-import TrackPlayer from 'react-native-track-player';
 import AddSongModal from '../components/modal/AddToPlaylistModal';
 
 const Main = () => {
+  const {height} = Dimensions.get('screen');
   const id = 'songs';
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState<string>('');
@@ -51,6 +53,14 @@ const Main = () => {
         sortBy: SortSongFields.TITLE,
         sortOrder: SortSongOrder.ASC,
       });
+      if (files.length === 0) {
+        ToastAndroid.showWithGravity(
+          'Music files not found',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        return;
+      }
       setMusic(files);
     } catch (error) {
       console.error('Error while fetching music list:', error);
@@ -90,13 +100,13 @@ const Main = () => {
     } catch (err) {
       console.warn(err);
     }
-  }, [fetchMusicList]);
+  }, []);
 
   useEffect(() => {
-    if (Platform.OS === 'android' && (!music || music.length === 0)) {
+    if (Platform.OS === 'android') {
       checkAndRequestReadStoragePermission();
     }
-  }, [checkAndRequestReadStoragePermission, music]);
+  }, [checkAndRequestReadStoragePermission]);
 
   const onHandleTrackPlayerSong = useCallback(
     async (selectedTrack: MusicFile) => {
@@ -117,7 +127,6 @@ const Main = () => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchMusicList().finally(() => setRefreshing(false));
-    TrackPlayer.add(musicArray);
   }, []);
 
   return (
@@ -143,18 +152,41 @@ const Main = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        ListEmptyComponent={() => (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginVertical: 5,
-            }}>
-            <Text style={{fontSize: 16, fontWeight: 'bold', color: '#fff'}}>
-              Song not found
-            </Text>
-          </View>
-        )}
+        ListEmptyComponent={() =>
+          filteredMusic?.length > 0 ? (
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 5,
+              }}>
+              <Text style={{fontSize: 16, fontWeight: 'bold', color: '#fff'}}>
+                Song not found
+              </Text>
+            </View>
+          ) : (
+            <View
+              style={{
+                marginTop: height / 3,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <TouchableOpacity
+                onPress={() => fetchMusicList()}
+                style={{
+                  backgroundColor: 'red',
+                  borderRadius: 10,
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                }}>
+                <Text
+                  style={{color: 'white', fontSize: 16, fontWeight: 'bold'}}>
+                  Load Music
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )
+        }
         showsVerticalScrollIndicator={false}
         maxToRenderPerBatch={10}
         maintainVisibleContentPosition={{

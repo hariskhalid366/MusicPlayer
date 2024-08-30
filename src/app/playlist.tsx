@@ -73,19 +73,23 @@ const Playlist = () => {
     );
   };
 
+  const EmptyComponent = () => {
+    return (
+      <TouchableOpacity
+        onPress={() => setModal(true)}
+        className="absolute rounded-2xl z-10 bottom-16 bg-white right-3 gap-x-1 p-2 flex-row">
+        <Icon.PlusIcon strokeWidth={3} color={'#000'} size={20} />
+        <Text className="text-sm text-black font-bold">Add Playlist</Text>
+      </TouchableOpacity>
+    );
+  };
+
   // Ensure playlistSongs is always an array
   const validPlaylistSongs = playlistSongs || [];
 
   return (
     <View className="flex-1">
-      {validPlaylistSongs.length > 0 && (
-        <TouchableOpacity
-          onPress={() => setModal(true)}
-          className="absolute rounded-2xl z-10 bottom-16 bg-white right-3 gap-x-1 p-2 flex-row">
-          <Icon.PlusIcon strokeWidth={3} color={'#000'} size={20} />
-          <Text className="text-sm text-black font-bold">Add Playlist</Text>
-        </TouchableOpacity>
-      )}
+      {validPlaylistSongs.length > 0 && <EmptyComponent />}
       {validPlaylistSongs.length > 0 ? (
         <ScrollView
           stickyHeaderIndices={[0]}
@@ -101,14 +105,17 @@ const Playlist = () => {
           ))}
         </ScrollView>
       ) : (
-        <TouchableOpacity
-          onPress={() => setModal(true)}
-          className="justify-center items-center rounded-2xl p-2 flex-row">
-          <Icon.PlusIcon color={'#fff'} size={23} />
-          <Text className="text-base text-white font-semibold tracking-wide">
-            Add Playlist
-          </Text>
-        </TouchableOpacity>
+        <>
+          <Header title="Playlist" />
+          <TouchableOpacity
+            onPress={() => setModal(true)}
+            className="justify-center items-center flex-1 rounded-2xl p-2 flex-row">
+            <Icon.PlusIcon color={'#fff'} size={23} />
+            <Text className="text-base text-white font-semibold tracking-wide">
+              Add Playlist
+            </Text>
+          </TouchableOpacity>
+        </>
       )}
       <PlaylistModal {...{modal, setModal, text, setText, createPlaylist}} />
     </View>

@@ -92,7 +92,6 @@ const Album = ({navigation}: any) => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    // Make sure this has a height and background color
     height: 80, // Adjust as needed
     backgroundColor: '#000', // Ensure visibility
     justifyContent: 'center',

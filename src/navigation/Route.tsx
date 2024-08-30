@@ -30,7 +30,7 @@ const Route = () => {
       console.log('BootSplash hidden');
       setIsInitialized(true);
     }
-  }, [isInitialized, music]);
+  }, [isInitialized]);
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {

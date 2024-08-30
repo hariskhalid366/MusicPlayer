@@ -1,4 +1,4 @@
-import {FlatList, Text, View} from 'react-native';
+import {Dimensions, FlatList, Text, View} from 'react-native';
 import React, {memo, useCallback} from 'react';
 import ListView, {MusicFile} from './ListView';
 import {handleTrackPlayerSong} from '../utility/handleTrackChange';
@@ -33,6 +33,8 @@ const FlatlistComponent = ({
     },
     [id, items, queueId, setQueueId],
   );
+
+  const {height} = Dimensions.get('screen');
 
   // Combine the header component with the list data if the header is provided
   const combinedData = ListHeaderComponent ? [{header: true}, ...items] : items;
