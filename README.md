@@ -18,6 +18,7 @@ This is a fully-featured Music Player application built using React Native CLI. 
 ## Tech Stack
 
 - **React Native CLI:** The core framework used to build the app.
+- **React Native Navigation:** The library used to navigate between screens.
 - **React Native Music Player:** The library used to handle music playback functionality.
 - **Zustand:** State management library used for local storage and app state management.
 - **Tailwind CSS:** Utilized for styling to ensure a clean and responsive design.
