@@ -41,8 +41,10 @@ const ControlButton = memo(({onPress, IconComponent, size, color}: any) => (
 export const Forward = ({size, color}: IconProps) => (
   <ControlButton
     onPress={async () => {
-      await TrackPlayer.skipToNext();
-      await TrackPlayer.play();
+      await TrackPlayer.skipToNext().then(async()=>
+      await TrackPlayer.play()
+      );
+
     }}
     IconComponent={Icon.ForwardIcon}
     size={size}
@@ -53,8 +55,9 @@ export const Forward = ({size, color}: IconProps) => (
 export const Backward = ({size, color}: IconProps) => (
   <ControlButton
     onPress={async () => {
-      await TrackPlayer.skipToPrevious();
-      await TrackPlayer.play();
+      await TrackPlayer.skipToPrevious().then(async()=>
+        await TrackPlayer.play()
+      );
     }}
     IconComponent={Icon.BackwardIcon}
     size={size}
@@ -66,7 +69,6 @@ export const RepeatButton = ({size, color}: IconProps) => {
   const [repeatMode, setRepeatMode] = useState<RepeatMode>(RepeatMode.Off);
 
   useEffect(() => {
-    // Fetch initial repeat mode
     TrackPlayer.getRepeatMode().then(setRepeatMode);
   }, []);
 

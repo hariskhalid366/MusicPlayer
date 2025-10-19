@@ -74,9 +74,8 @@ const AddSongModal:FC<AddSongModalProps> = ({isVisible,setIsVisible,setCurrentTr
     <Modal
       transparent
       statusBarTranslucent
-      animationType="slide"
+      animationType='slide'
       onRequestClose={onClose}
-    
       visible={isVisible}>
       <View className="flex-1 justify-end items-center bg-red-500/30">
         <View className="h-screen bg-black w-full rounded-t-3xl">

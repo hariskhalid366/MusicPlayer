@@ -32,7 +32,7 @@ export async function playbackService() {
       android: {
         alwaysPauseOnInterruption: true,
         appKilledPlaybackBehavior:
-          AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+          AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,          
       },
       capabilities: [
         Capability.Play,
@@ -43,25 +43,14 @@ export async function playbackService() {
         Capability.JumpBackward,
         Capability.JumpBackward,
       ],
-      compactCapabilities: [
+   
+      notificationCapabilities:[
         Capability.Play,
         Capability.Pause,
         Capability.SkipToNext,
         Capability.SkipToPrevious,
         Capability.Stop,
-        Capability.JumpBackward,
-        Capability.JumpBackward,
-      ],
-      notificationCapabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.SkipToNext,
-        Capability.SkipToPrevious,
-        Capability.Stop,
-        Capability.JumpBackward,
-        Capability.JumpBackward,
-      ],
-      color: 99410543,
+      ]
     });
   } catch (error) {
     console.log(error);

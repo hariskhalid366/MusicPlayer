@@ -3,7 +3,6 @@ import TrackPlayer, {
   AndroidAudioContentType,
   RepeatMode,
 } from 'react-native-track-player';
-import showToast from '../components/Toast';
 
 interface SetupTrackPlayer {
   onLoad?: () => void;
@@ -11,30 +10,22 @@ interface SetupTrackPlayer {
 }
 
 const setupTrack = async () => {
-  showToast('calling Setup');
-
-  const setup = async () => {
     try {
       await TrackPlayer.setupPlayer({
         maxCacheSize: 1024 * 30,
         androidAudioContentType: AndroidAudioContentType.Sonification,
+        backBuffer:5,
+        playBuffer:5,
+        maxBuffer:100
       });
 
       await TrackPlayer.setRepeatMode(RepeatMode.Queue);
       console.log('Track Player setup complete');
       return undefined;
     } catch (error: any) {
-      console.error('Error setting up Track Player:', error);
+      console.log('Error setting up Track Player:', error);
       return error?.code;
     }
-  };
-
-  // Retry setup if background initialization issue occurs (Android)
-  while ((await setup()) === 'android_cannot_setup_player_in_background') {
-    console.log("lhjgkhj");
-    
-    await new Promise<void>((resolve) => setTimeout(resolve, 1));
-  }
 };
 
 export const useSetupTrackPlayer = ({ onLoad, Track }: SetupTrackPlayer) => {
@@ -51,19 +42,18 @@ export const useSetupTrackPlayer = ({ onLoad, Track }: SetupTrackPlayer) => {
 
           if (onLoad) onLoad();
         } catch (err) {
-          console.error('Initialization error:', err);
+          console.log('Initialization error:', err);
           isInitialized.current = false;
         }
       }
 
       if (Track && !hasAddedTrack.current) {
         try {
-          await TrackPlayer.reset();
           await TrackPlayer.add(Track);
           hasAddedTrack.current = true;
           console.log('Tracks added to player');
         } catch (err) {
-          console.error('Error adding tracks:', err);
+          console.log('Error adding tracks:', err);
         }
       }
     };
@@ -75,3 +65,43 @@ export const useSetupTrackPlayer = ({ onLoad, Track }: SetupTrackPlayer) => {
     };
   }, [onLoad, Track]);
 };
+
+
+// import {useEffect, useRef} from 'react';
+// import TrackPlayer, {
+//   AndroidAudioContentType,
+//   RepeatMode,
+// } from 'react-native-track-player';
+
+// const setupTrack = async () => {
+//   await TrackPlayer.setupPlayer({
+//       maxCacheSize: 1024 * 30,
+//       androidAudioContentType: AndroidAudioContentType.Sonification,
+//       backBuffer:20,
+//       playBuffer:60,
+//       maxBuffer:100
+//   });
+//   await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+// };
+
+// interface SetupTrackPlayer {
+//   onLoad?: () => void;
+//   Track: any;
+// }
+
+// export const useSetupTrackPlayer = ({onLoad, Track}: SetupTrackPlayer) => {
+//   const isInitialize = useRef(false);
+
+//   useEffect(() => {
+//     setupTrack()
+//       .then(() => {
+//         isInitialize.current = true;
+//         onLoad?.();
+//         TrackPlayer.add(Track);
+//       })
+//       .catch(err => {
+//         isInitialize.current = false;
+//         console.log(err);
+//       });
+//   }, [onLoad]);
+// };

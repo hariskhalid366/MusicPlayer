@@ -49,16 +49,14 @@ const Album = ({ navigation }: any) => {
   }, [music, artist, setArtist]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000' }}>
       <ScrollView
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
         decelerationRate={0.6}
         scrollEventThrottle={16}
         contentContainerStyle={{
-          paddingHorizontal: 10,
           paddingVertical: 10,
-          paddingBottom: 150,
+          paddingBottom: 100,
         }}
       >
         <Header title="Artists" />
@@ -88,7 +86,6 @@ const Album = ({ navigation }: any) => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-    </View>
   );
 };
 
@@ -103,12 +100,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
+    paddingHorizontal: 20,
+
   },
   image: {
     width: 55,
     height: 55,
     borderRadius: 30,
     marginRight: 16,
+    backgroundColor:"#ffffff55"
   },
   defaultIcon: {
     marginRight: 16,

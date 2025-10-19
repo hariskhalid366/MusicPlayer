@@ -1,60 +1,94 @@
-import React from 'react'; // Removed useState, useEffect
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import TrackPlayer, {
+import React, { FC, useEffect } from 'react'; // Removed useState, useEffect
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import  {
   useActiveTrack,
-  // RepeatMode removed as it's handled in RepeatButton
 } from 'react-native-track-player';
-// Import RepeatButton along with others
-import PlayPause, {Forward, MusicSlider, RepeatButton} from './PlayerControls';
-import {useNavigation} from '@react-navigation/native';
+import PlayPause, { Forward, MusicSlider, RepeatButton } from './PlayerControls';
+import { useNavigation } from '@react-navigation/native';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle, useSharedValue, Easing, withTiming, withSpring } from 'react-native-reanimated';
 
-const FloatingTrack = () => {
+const FloatingTrack: FC<any> = ({ floatName = "index" }) => {
+
   const navigation: any = useNavigation();
   const track = useActiveTrack();
 
-  // Removed repeatMode state and related logic (useEffect, toggleRepeatMode, getRepeatIcon, getRepeatIconStyle)
+  const bottomValue = useSharedValue(0)
+  const scaleValue = useSharedValue(0)
+  const Touchable = Animated.createAnimatedComponent(TouchableOpacity)
+
+  const animatedStyles = useAnimatedStyle(() => {
+    const bottom = interpolate(bottomValue.value, [0, 1, 2], [60, 5, -100], Extrapolation.CLAMP)
+    const scale = interpolate(scaleValue.value, [0, 1,], [1, 0.6], Extrapolation.CLAMP)
+    return {
+      bottom,
+      transform: [
+        { scale },
+     
+      ],
+    }
+  }, [])
+
+
+  useEffect(() => {
+    if (floatName !== "index") {
+      bottomValue.value = withTiming(1, { duration: 100, easing: Easing.exp })
+    if (
+      floatName === "screen"
+    ) {
+      bottomValue.value = withTiming(2, { duration: 100, easing: Easing.exp })
+      scaleValue.value = withSpring(1, {duration:200 })
+    }
+    }
+    
+    else {
+      bottomValue.value = withTiming(0, { duration: 100, easing: Easing.out(Easing.ease) })
+      scaleValue.value = withSpring(0, {duration:200 })
+
+
+
+    }
+  }, [floatName])
 
   if (!track) return null;
 
   return (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('screen')}
-      activeOpacity={0.8}
-      style={styles.container}>
-      <View style={styles.innerContainer}>
-        <Image
-          source={
-            track?.cover
-              ? {uri: track.cover}
-              : require('../../assets/tile.jpeg')
-          }
-          style={styles.image}
-        />
-        <View style={styles.trackInfo}>
-          <Text
-            style={styles.trackTitle}
-            numberOfLines={1}
-            ellipsizeMode="tail">
-            {track.title?.slice(0, 29)}
-          </Text>
-          <MusicSlider style={styles.slider} />
+      <Touchable
+        onPress={() => navigation.navigate('screen')}
+        activeOpacity={0.8}
+        style={[styles.container, animatedStyles]}>
+        <View style={styles.innerContainer}>
+          <Image
+            source={
+              track?.cover
+                ? { uri: track.cover }
+                : require('../../assets/tile.jpeg')
+            }
+            style={styles.image}
+          />
+          <View style={styles.trackInfo}>
+            <Text
+              style={styles.trackTitle}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {track.title?.slice(0, 29)}
+            </Text>
+            <MusicSlider style={styles.slider} />
+          </View>
+          <RepeatButton size={20} color="#fff" />
+          <PlayPause size={20} color="#fff" />
+          <Forward size={20} color="#fff" />
         </View>
-        {/* Replaced TouchableOpacity/Image with RepeatButton component */}
-        <RepeatButton size={23} color="#fff" />
-        <PlayPause size={23} color="#fff" />
-        <Forward size={23} color="#fff" />
-      </View>
-    </TouchableOpacity>
+      </Touchable>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width: '95%',
+    width: '92%',
     position: 'absolute',
     alignItems: 'center',
     alignSelf: 'center',
-    bottom: 59,
+    
   },
   innerContainer: {
     flexDirection: 'row',
@@ -62,7 +96,7 @@ const styles = StyleSheet.create({
     padding: 1,
     height: 66,
     marginHorizontal: 3,
-    borderRadius: 15,
+    borderRadius: 12,
     backgroundColor: 'rgba(255, 0, 0, 0.7)',
     borderWidth: 1.2,
     borderColor: '#ffffff22',
@@ -70,7 +104,8 @@ const styles = StyleSheet.create({
   image: {
     width: 60,
     height: 60,
-    borderRadius: 15,
+    borderRadius: 12,
+    backgroundColor: "#00000099"
   },
   trackInfo: {
     flex: 1,

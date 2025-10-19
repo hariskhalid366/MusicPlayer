@@ -84,7 +84,6 @@ const Playlist = () => {
     );
   };
 
-  // Ensure playlistSongs is always an array
   const validPlaylistSongs = playlistSongs || [];
 
   return (

@@ -1,9 +1,8 @@
 import React, {memo} from 'react';
 import Main from '../app/music';
 import * as Icon from 'react-native-heroicons/outline';
-import {Text, View} from 'react-native';
+import {ActivityIndicator, Text, View} from 'react-native';
 import Album from '../app/album';
-import LoaderKit from 'react-native-loader-kit';
 
 import Favourite from '../app/favourite';
 import Playlist from '../app/playlist';
@@ -37,11 +36,7 @@ const BottomTabs = () => {
           lazy: true,
           lazyPlaceholder: () => (
             <View style={{flex:1,justifyContent:"center",alignItems:"center"}} >
-              <LoaderKit
-                name="LineSpinFadeLoader"
-                color="#fff"
-                style={{width: 40, height: 40}}
-              />
+             <ActivityIndicator color={"#fff"} size={"large"}/>
             </View>
           ),
         })}>
@@ -99,7 +94,7 @@ const BottomTabs = () => {
           component={Album}
         />
       </Tab.Navigator>
-      <FloatingTrack />
+      {/* <FloatingTrack /> */}
     </>
   );
 };

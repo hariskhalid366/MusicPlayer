@@ -1,5 +1,6 @@
 import TrackPlayer from 'react-native-track-player';
 import { MusicFile } from '../constants/type';
+import showToast from '../components/Toast';
 
 export const handleTrackPlayerSong = async (
   selectedTrack: MusicFile,
@@ -36,6 +37,7 @@ export const handleTrackPlayerSong = async (
   } catch (error) {
     
      setLoading(false)
+     showToast("Player is not ready")
     
     console.log('Error handling track change:', error);
   }

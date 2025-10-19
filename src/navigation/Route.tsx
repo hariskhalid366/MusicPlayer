@@ -1,6 +1,6 @@
-import React, { memo, useCallback, useEffect } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, AppStateStatus, TouchableOpacity } from 'react-native';
-import { NavigationContainer, StackActions } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabs from './BottomTabs';
 import BootSplash from 'react-native-bootsplash';
@@ -13,13 +13,14 @@ import * as Icon from 'react-native-heroicons/outline';
 import ArtistsSongs from '../app/artistsSongs';
 import PlaylistSongs from '../app/playlistSongs';
 import { MusicFile } from '../constants/type';
+import FloatingTrack from '../components/FloatingTrack';
 
 const Route = () => {
   const [music, setMusic] = useMMKVObject<string | MusicFile[]>(
     'musicList',
     Storage,
   );
-
+  
   const Stack = createNativeStackNavigator();
 
   const [isInitialized, setIsInitialized] = React.useState(false);
@@ -33,47 +34,22 @@ const Route = () => {
     }
   }, [isInitialized]);
 
-  useEffect(() => {
-    const handleAppStateChange = (nextAppState: AppStateStatus) => {
-      if (nextAppState === 'active') {
-        console.log("state", nextAppState);
-
-        init();
-      }
-    };
-
-    const subscription = AppState.addEventListener(
-      'change',
-      handleAppStateChange,
-    );
-
-    return () => {
-      subscription.remove();
-    };
-  }, [init]);
-
-  // useSetupTrackPlayer({
-  //   onLoad: init,
-  //   Track: music,
-  // });
+  useSetupTrackPlayer({
+    onLoad: init,
+    Track: music,
+  });
 
   useLogTrackPlayerState();
-
-  const Touchable = ({ navigation }: any) => (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.pop();
-      }}
-      style={{ padding: 2, borderRadius: 200, backgroundColor: '#ffffff21' }}
-    >
-      <Icon.ChevronDownIcon size={23} color={'#fff'} strokeWidth={2} />
-    </TouchableOpacity>
-  );
+  const [routeState,setRouteState] =useState<any>("index")
 
   return (
     <NavigationContainer
+     onStateChange={(state) => {
+       setRouteState(state?.routes[state.index].name);
+    }}
       onReady={() => {
         console.log('Navigation ready');
+        init()
       }}
       theme={{
         dark: true,
@@ -97,7 +73,6 @@ const Route = () => {
         screenOptions={{
           animation: 'slide_from_bottom',
           navigationBarColor: '#000',
-          // statusBarColor: '#000',
         }}
       >
         <Stack.Screen
@@ -172,7 +147,9 @@ const Route = () => {
           })}
         />
       </Stack.Navigator>
+      <FloatingTrack floatName={routeState} />
     </NavigationContainer>
+    
   );
 };
 

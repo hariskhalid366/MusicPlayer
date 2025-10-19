@@ -19,6 +19,7 @@ import PlayPause, {
   Backward,
   Forward,
   MusicSlider,
+  RepeatButton,
 } from '../components/PlayerControls';
 import LoaderKit from 'react-native-loader-kit';
 import { useMMKVObject } from 'react-native-mmkv';
@@ -83,23 +84,17 @@ const FloatingScreen = () => {
             : require('../../assets/tile.jpeg')
         }
       />
-      {playing ? (
-        <View style={styles.icon}>
-          <LoaderKit
-            name="LineScaleParty"
-            color="#fff"
-            style={styles.loaderKit}
-          />
-        </View>
-      ) : (
-        <View style={styles.icon}>
+      <View style={styles.icon}>
+        {playing ? (
+          <Icon.PauseIcon size={40} color={'#fff'} />
+        ) : (
           <Icon.PlayIcon size={40} color={'#fff'} />
-        </View>
-      )}
+        )}
+      </View>
       <View style={styles.trackInfoContainer}>
         <View style={styles.trackTextContainer}>
-          <Text>{track?.title}</Text>
-          <Text>{track?.artist}</Text>
+          <Text style={styles.titleText}>{track?.title}</Text>
+          <Text style={styles.titleText}>{track?.artist}</Text>
         </View>
         <TouchableOpacity
           onPress={() => ToggleLike(track)}
@@ -111,11 +106,13 @@ const FloatingScreen = () => {
             <Icon.HeartIcon size={23} color={'#fff'} />
           )}
         </TouchableOpacity>
+         <RepeatButton size={20} color='#fff'/>
+
       </View>
       <MusicSlider style={styles.musicSlider} />
       <View style={styles.timeContainer}>
-        <Text>{convertSecondsToTime(position)}</Text>
-        <Text>{convertSecondsToTime(duration)}</Text>
+        <Text style={styles.counterText}>{convertSecondsToTime(position)}</Text>
+        <Text style={styles.counterText}>{convertSecondsToTime(duration)}</Text>
       </View>
       <View style={styles.controlsContainer}>
         <Backward size={30} color={'#fff'} />
@@ -185,4 +182,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '80%',
   },
+  counterText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600"
+  },
+  titleText: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "bold",
+
+  }
 });

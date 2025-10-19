@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
-  ActivityIndicator,
 } from 'react-native';
 import * as Icon from 'react-native-heroicons/outline';
 import * as IconSolid from 'react-native-heroicons/solid';
@@ -16,12 +15,10 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  withDelay,
   Easing,
 } from 'react-native-reanimated';
 import { useMMKVObject } from 'react-native-mmkv';
 import { Storage } from '../service/Store';
-import useBearState from '../service/GlobalState';
 import type { ListItemProps, MusicFile } from '../constants/type';
 import AddSongModal from './modal/AddToPlaylistModal';
 
@@ -42,19 +39,17 @@ const ListView = ({
   deleteItem,
 }: ListItemProps) => {
 
-  const DROPDOWN_HEIGHT = 60;
+  const DROPDOWN_HEIGHT = 65;
   const DROPDOWN_OPEN_DURATION = 250;
   const DROPDOWN_AUTO_CLOSE_DELAY = 10000;
   const DROPDOWN_CLOSE_DURATION = 300;
 
 
-  // active track: re-renders item if it becomes active - expected
   const activeTrack = useActiveTrack();
   const isActive = activeTrack?.url === item?.url;
   const [currentTrack,setCurrentTrack]=useState<MusicFile | null>(null)
   const [isVisible,setIsVisible]=useState<boolean>(false)
 
-  // playing state is global and will update items when changed (expected)
   const isPlaying = useIsPlaying()?.playing ?? false;
 
 
@@ -90,10 +85,8 @@ const ListView = ({
   const dropDown = useSharedValue(0);
 
   const toggleDropdown = useCallback(() => {
-    console.log(dropDown.value, "toggle");
-
     if (dropDown.value === 0) {
-      dropDown.value = withTiming(1, { duration: DROPDOWN_OPEN_DURATION, easing: Easing.back(1.7) },);
+      dropDown.value = withTiming(1, { duration: DROPDOWN_OPEN_DURATION, easing: Easing.in(Easing.cubic) },);
       setTimeout(() => {
         dropDown.value = withTiming(0, { duration: DROPDOWN_CLOSE_DURATION, easing: Easing.inOut(Easing.cubic) });
       }, DROPDOWN_AUTO_CLOSE_DELAY)
@@ -108,6 +101,7 @@ const ListView = ({
     return {
       height,
       opacity: dropDown.value,
+      marginTop:height === DROPDOWN_HEIGHT ? 6:0,
       transform: [{ scale }],
     };
   }, []);
@@ -116,7 +110,6 @@ const ListView = ({
     () => [
       styles.container,
       isActive && !isSelected ? styles.activeContainer : null,
-      isSelected ? styles.selectedContainer : null,
     ],
     [isActive, isSelected],
   );
@@ -124,7 +117,7 @@ const ListView = ({
   const PlaybackIndicator = useMemo(
     () => (
       <View style={styles.icon}>
-        {isPlaying ? <ActivityIndicator size="small" color="#fff" /> : <Icon.PlayIcon size={23} color="#fff" />}
+        {isPlaying ? <Icon.PauseIcon size={23} color="#fff" /> : <Icon.PlayIcon size={23} color="#fff" />}
       </View>
     ),
     [isPlaying],
@@ -138,16 +131,12 @@ const ListView = ({
     <>
     <TouchableOpacity activeOpacity={0.85} key={item.duration + index} onPress={onPress} style={containerStyle}>
       <View style={styles.row}>
-        {isSelected && (
-          <View style={styles.selectionIndicator}>
-            <IconSolid.CheckCircleIcon size={20} color="#34D399" />
-          </View>
-        )}
 
         <Image
           source={item.cover ? { uri: item.cover } : require('../../assets/tile.jpeg')}
           style={styles.image}
           resizeMode="cover"
+          resizeMethod="resize"
         />
 
         {isActive && !isSelected && PlaybackIndicator}
@@ -218,44 +207,26 @@ export default memo(ListView, areEqual);
 const styles = StyleSheet.create({
   container: {
     marginTop: 12,
-    marginHorizontal: 8,
-    borderRadius: 16,
-    zIndex: 0,
+    marginHorizontal: 10,
+    borderRadius: 12,
+    padding:4
   },
   activeContainer: {
-    backgroundColor: 'rgba(255,0,0,0.12)',
-  },
-  selectedContainer: {
-    backgroundColor: 'rgba(0,100,255,0.08)',
-    borderColor: 'rgba(0,100,255,0.6)',
-    borderWidth: 1,
-  },
-  selectionIndicator: {
-    position: 'absolute',
-    left: -6,
-    top: -6,
-    zIndex: 2,
-    backgroundColor: '#000',
-    borderRadius: 12,
-    padding: 2,
-  },
+    backgroundColor: 'rgba(255,0,0,0.5)',
+  }, 
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 6,
   },
   image: {
     width: 65,
     height: 65,
-    borderRadius: 12,
-    overflow: 'hidden',
+    borderRadius:12,
+    overflow:"hidden",
     backgroundColor: '#222',
   },
   icon: {
     position: 'absolute',
-    left: 5,
-    top: 5,
     backgroundColor: 'rgba(0,0,0,0.55)',
     width: 65,
     height: 65,
@@ -287,8 +258,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     flexDirection: 'row',
     borderRadius: 10,
-    backgroundColor: 'rgba(0,0,0,0.22)',
-    marginTop: -4,
+    backgroundColor: 'rgba(225,225,225,0.20)',
   },
   dropdownItem: {
     justifyContent: 'center',

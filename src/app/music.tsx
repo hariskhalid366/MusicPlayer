@@ -2,7 +2,6 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
-  FlatList,
   Alert,
   ToastAndroid,
   TouchableOpacity,
@@ -17,14 +16,14 @@ import {
 } from 'react-native';
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
 import RNFS from 'react-native-fs';
-import TrackPlayer, { RepeatMode, TrackType } from 'react-native-track-player';
+import TrackPlayer from 'react-native-track-player';
 import { Storage } from '../service/Store';
 import HeaderSearchBar from '../components/HeaderSearchBar';
 import ListView from '../components/ListView';
-import AddSongModal from '../components/modal/AddToPlaylistModal';
 import LoadingTrack from '../components/loading';
 import { handleTrackPlayerSong } from '../utility/handleTrackChange';
 import { MusicFile } from '../constants/type';
+import { FlatList } from 'react-native-gesture-handler';
 
 const { MusicFiles } = NativeModules;
 
@@ -66,7 +65,7 @@ const Main = () => {
       }
       setMusic(filtered);
     } catch (error) {
-      console.error('Error fetching music:', error);
+      console.log('Error fetching music:', error);
     } finally {
       setLoading(false);
     }
@@ -139,7 +138,7 @@ const Main = () => {
                 setMusic(updatedList);
                 await TrackPlayer.reset();
               } catch (error) {
-                console.error('Error deleting file:', error);
+                console.log('Error deleting file:', error);
               }
             },
           },
@@ -200,7 +199,7 @@ const Main = () => {
         initialNumToRender={20}
         maxToRenderPerBatch={25}
         windowSize={15}
-        decelerationRate="fast"
+        decelerationRate={0.4}
         removeClippedSubviews
         scrollEventThrottle={16}
         contentContainerStyle={styles.listContent}

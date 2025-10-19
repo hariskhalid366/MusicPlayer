@@ -17,7 +17,7 @@ const PlaylistModal: FC<PlaylistModalProps> = ({
   createPlaylist,
 }) => {
   return (
-    <Modal transparent animationType="slide" visible={modal}>
+    <Modal transparent animationType='fade' visible={modal}>
       <Pressable
         onPress={() => setModal(false)}
         className="flex-1 justify-center z-0 items-center bg-[#00000099]">
@@ -28,7 +28,6 @@ const PlaylistModal: FC<PlaylistModalProps> = ({
           <View className="my-2 space-y-1">
             <Text className="text-white font-semibold text-sm">Title</Text>
             <TextInput
-              autoFocus
               value={text}
               onChangeText={e => setText(e)}
               maxLength={160}

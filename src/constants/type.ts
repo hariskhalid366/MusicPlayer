@@ -11,7 +11,7 @@ export type ListItemProps = {
   item: MusicFile;
   index: number;
   handleTrack: (track: MusicFile) => void;
-  deleteItem: (track: MusicFile) => void;
+  deleteItem?: (track: MusicFile) => void;
   playlist?: boolean;
   isSelected?: boolean; // Added isSelected prop
   selectionModeActive?: boolean; // Added to know if selection mode is on

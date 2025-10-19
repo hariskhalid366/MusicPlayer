@@ -6,7 +6,6 @@ import {Storage} from '../service/Store';
 import {PlaylistProps} from './playlist';
 import LoadingTrack from '../components/loading';
 import FlatlistComponent from '../components/FlatlistComponent';
-import Header from '../components/Header';
 
 const PlaylistSongs = ({navigation, route}: any) => {
   const items: PlaylistProps = route.params.item;
@@ -21,7 +20,7 @@ const PlaylistSongs = ({navigation, route}: any) => {
   const [queueId, setQueueId] = useMMKVString('queueId', Storage);
 
   return (
-    <View style={{flex: 1, backgroundColor: '#000'}}>
+    <View style={{flex: 1}}>
       {loading && <LoadingTrack />}
       <FlatlistComponent
         items={items.songs}
