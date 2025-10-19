@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,7 @@ import { useMMKVObject } from 'react-native-mmkv';
 import { Storage } from '../service/Store';
 import useBearState from '../service/GlobalState';
 import type { ListItemProps, MusicFile } from '../constants/type';
+import AddSongModal from './modal/AddToPlaylistModal';
 
 export const convertMillisecondsToTime = (milliseconds: number) => {
   const totalSeconds = Math.floor(milliseconds / 1000);
@@ -50,11 +51,12 @@ const ListView = ({
   // active track: re-renders item if it becomes active - expected
   const activeTrack = useActiveTrack();
   const isActive = activeTrack?.url === item?.url;
+  const [currentTrack,setCurrentTrack]=useState<MusicFile | null>(null)
+  const [isVisible,setIsVisible]=useState<boolean>(false)
 
   // playing state is global and will update items when changed (expected)
   const isPlaying = useIsPlaying()?.playing ?? false;
 
-  const { setCurrentTrack, setIsVisible } = useBearState();
 
   const onPress = useCallback(() => {
     if (isActive) {
@@ -133,6 +135,7 @@ const ListView = ({
   }, [deleteItem, item]);
 
   return (
+    <>
     <TouchableOpacity activeOpacity={0.85} key={item.duration + index} onPress={onPress} style={containerStyle}>
       <View style={styles.row}>
         {isSelected && (
@@ -190,6 +193,13 @@ const ListView = ({
         </TouchableOpacity>
       </Animated.View>
     </TouchableOpacity>
+    <AddSongModal
+      isVisible={isVisible}
+      setIsVisible={setIsVisible}
+      currentTrack={currentTrack}
+      setCurrentTrack={setCurrentTrack}
+    />
+    </>
   );
 };
 

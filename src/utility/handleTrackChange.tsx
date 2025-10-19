@@ -34,6 +34,9 @@ export const handleTrackPlayerSong = async (
     }
     await TrackPlayer.play();
   } catch (error) {
-    console.error('Error handling track change:', error);
+    
+     setLoading(false)
+    
+    console.log('Error handling track change:', error);
   }
 };

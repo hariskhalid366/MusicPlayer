@@ -32,16 +32,19 @@ const PlaylistModal: FC<PlaylistModalProps> = ({
               value={text}
               onChangeText={e => setText(e)}
               maxLength={160}
+              
               cursorColor={'#ffffff'}
               style={{
                 borderBottomWidth: 2,
                 padding: 0,
                 borderBottomColor: '#fff',
+                color:"#fff",
+                fontWeight:"700"
               }}
             />
-            <Text className="text-right">{text.length}/160</Text>
+            <Text className="text-right text-white top-2">{text.length}/160</Text>
           </View>
-          <View className="flex-row items-center justify-end space-x-8 mt-4 mb-1">
+          <View className="flex-row items-center justify-end space-x-8 mt-4 mb-1 gap-4">
             <TouchableOpacity onPress={() => setModal(false)}>
               <Text className="text-white font-semibold">Cancel</Text>
             </TouchableOpacity>

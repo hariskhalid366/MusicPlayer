@@ -2,6 +2,7 @@ import {Text, TextInput, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import * as Icon from 'react-native-heroicons/solid';
 import Animated, {
+  Easing,
   Extrapolation,
   interpolate,
   useAnimatedStyle,
@@ -50,12 +51,16 @@ const HeaderSearchBar = ({search, setSearch, title}: ContainerProps) => {
 
   const searchValue = () => {
     if (searchVal.value === 0) {
-      searchVal.value = withSpring(1, {
-        damping: 30,
+      searchVal.value = withTiming(1, {
+        duration: 100,
+        easing:Easing.out(Easing.ease)
+
       });
     } else {
-      searchVal.value = withSpring(0, {
-        damping: 10,
+      searchVal.value = withTiming(0, {
+        duration: 60,
+        easing:Easing.ease
+        
       });
     }
     setSearch('');

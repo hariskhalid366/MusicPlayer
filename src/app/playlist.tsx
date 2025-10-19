@@ -77,8 +77,8 @@ const Playlist = () => {
     return (
       <TouchableOpacity
         onPress={() => setModal(true)}
-        className="absolute rounded-2xl z-10 bottom-16 bg-white right-3 gap-x-1 p-2 flex-row">
-        <Icon.PlusIcon strokeWidth={3} color={'#000'} size={20} />
+        className="absolute bottom-16 right-3 z-10 bg-white flex-row px-5 py-3 rounded-xl ">
+        <Icon.PlusIcon strokeWidth={2} color={'#000'} size={20} />
         <Text className="text-sm text-black font-bold">Add Playlist</Text>
       </TouchableOpacity>
     );

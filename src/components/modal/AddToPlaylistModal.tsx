@@ -8,21 +8,27 @@ import {
   Image,
   ToastAndroid,
 } from 'react-native';
-import React from 'react';
+import React, { FC } from 'react';
 import * as Icon from 'react-native-heroicons/solid';
 import {useMMKVObject} from 'react-native-mmkv';
 import {Storage} from '../../service/Store';
 import {PlaylistProps} from '../../app/playlist';
 import { MusicFile } from '../../constants/type';
-import useBearState from '../../service/GlobalState';
 import Header from '../Header';
 
-const AddSongModal = () => {
+interface AddSongModalProps{
+  isVisible: boolean,
+  currentTrack: MusicFile | null,
+  setIsVisible: (value: boolean) => void,
+  setCurrentTrack: (value: MusicFile | null) => void
+
+}
+
+const AddSongModal:FC<AddSongModalProps> = ({isVisible,setIsVisible,setCurrentTrack,currentTrack}) => {
   const [playlistSongs, setPlaylistSongs] =
     useMMKVObject<PlaylistProps[]>('playlist', Storage) || [];
 
-  const {isVisible, setIsVisible, currentTrack, setCurrentTrack} =
-    useBearState();
+
 
   const validPlaylistSongs = playlistSongs || [];
 
@@ -61,7 +67,7 @@ const AddSongModal = () => {
 
   const onClose=()=>{
      setIsVisible(false);
-              setCurrentTrack(null);
+     setCurrentTrack(null);
   }
 
   return (

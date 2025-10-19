@@ -19,10 +19,11 @@ const Route = () => {
     'musicList',
     Storage,
   );
-  
+
   const Stack = createNativeStackNavigator();
-  
+
   const [isInitialized, setIsInitialized] = React.useState(false);
+
   const init = useCallback(async () => {
     if (!isInitialized) {
       console.log('Initializing app...');
@@ -31,18 +32,12 @@ const Route = () => {
       setIsInitialized(true);
     }
   }, [isInitialized]);
-  
-  // useSetupTrackPlayer({
-  //   onLoad: init,
-  //   Track: music,
-  // });
-
-  useLogTrackPlayerState();
-  
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === 'active') {
+        console.log("state", nextAppState);
+
         init();
       }
     };
@@ -57,6 +52,12 @@ const Route = () => {
     };
   }, [init]);
 
+  // useSetupTrackPlayer({
+  //   onLoad: init,
+  //   Track: music,
+  // });
+
+  useLogTrackPlayerState();
 
   const Touchable = ({ navigation }: any) => (
     <TouchableOpacity
@@ -73,7 +74,6 @@ const Route = () => {
     <NavigationContainer
       onReady={() => {
         console.log('Navigation ready');
-        init();
       }}
       theme={{
         dark: true,
@@ -118,7 +118,15 @@ const Route = () => {
             },
             headerTitleAlign: 'center',
             presentation: 'fullScreenModal',
-            headerLeft: () => <Touchable navigation={navigation} />,
+            headerLeft: () =>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.pop();
+                }}
+                style={{ padding: 2, borderRadius: 200, backgroundColor: '#ffffff21' }}
+              >
+                <Icon.ChevronDownIcon size={23} color={'#fff'} strokeWidth={2} />
+              </TouchableOpacity>
           })}
         />
         <Stack.Screen
@@ -131,7 +139,15 @@ const Route = () => {
             },
             headerTitleAlign: 'center',
             presentation: 'fullScreenModal',
-            headerLeft: () => <Touchable />,
+            headerLeft: () =>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.pop();
+                }}
+                style={{ padding: 2, borderRadius: 200, backgroundColor: '#ffffff21' }}
+              >
+                <Icon.ChevronDownIcon size={23} color={'#fff'} strokeWidth={2} />
+              </TouchableOpacity>
           })}
         />
         <Stack.Screen
@@ -144,7 +160,15 @@ const Route = () => {
             },
             headerTitleAlign: 'center',
             presentation: 'fullScreenModal',
-            headerLeft: () => <Touchable />,
+            headerLeft: () =>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.pop();
+                }}
+                style={{ padding: 2, borderRadius: 200, backgroundColor: '#ffffff21' }}
+              >
+                <Icon.ChevronDownIcon size={23} color={'#fff'} strokeWidth={2} />
+              </TouchableOpacity>
           })}
         />
       </Stack.Navigator>

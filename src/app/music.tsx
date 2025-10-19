@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
 import RNFS from 'react-native-fs';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { RepeatMode, TrackType } from 'react-native-track-player';
 import { Storage } from '../service/Store';
 import HeaderSearchBar from '../components/HeaderSearchBar';
 import ListView from '../components/ListView';
@@ -38,7 +38,6 @@ const Main = () => {
   const id = 'songs';
   const musicArray = Array.isArray(music) ? music : [];
 
-
   const filteredMusic = useMemo(() => {
     const query = search.toLowerCase();
     return musicArray.filter(
@@ -55,7 +54,8 @@ const Main = () => {
     try {
       const files = await MusicFiles.getAllAudioFiles();
       const filtered = files.filter((m: MusicFile) => !m.title?.startsWith('AUD'));
-
+      
+      await TrackPlayer.add(files)
       if (filtered.length === 0) {
         ToastAndroid.showWithGravity(
           'No music files found',
@@ -164,7 +164,7 @@ const Main = () => {
 
   const EmptyComponent = useMemo(
     () =>
-      filteredMusic.length > 0 ? (
+      filteredMusic.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>Song not found</Text>
         </View>
@@ -206,7 +206,7 @@ const Main = () => {
         contentContainerStyle={styles.listContent}
       />
 
-      <AddSongModal />
+      {/* <AddSongModal /> */}
     </View>
   );
 };
