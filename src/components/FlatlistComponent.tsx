@@ -80,6 +80,7 @@ const FlatlistComponent = ({
         autoscrollToTopThreshold: 10,
         minIndexForVisible: 20,
       }}
+      windowSize={50}
       maxToRenderPerBatch={10}
       decelerationRate={0.6}
       scrollEventThrottle={16}

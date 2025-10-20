@@ -6,7 +6,6 @@ import Album from '../app/album';
 
 import Favourite from '../app/favourite';
 import Playlist from '../app/playlist';
-import FloatingTrack from '../components/FloatingTrack';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 const BottomTabs = () => {
@@ -16,6 +15,8 @@ const BottomTabs = () => {
       <Tab.Navigator
         initialRouteName="Songs"
         tabBarPosition="bottom"
+        keyboardDismissMode="on-drag"
+        key={"BottomTabs"}
         screenOptions={({route}) => ({
           sceneStyle: {
             backgroundColor: '#000000',

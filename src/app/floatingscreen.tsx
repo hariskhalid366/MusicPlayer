@@ -21,7 +21,6 @@ import PlayPause, {
   MusicSlider,
   RepeatButton,
 } from '../components/PlayerControls';
-import LoaderKit from 'react-native-loader-kit';
 import { useMMKVObject } from 'react-native-mmkv';
 import { Storage } from '../service/Store';
 
@@ -137,6 +136,7 @@ const styles = StyleSheet.create({
     height: size,
     borderRadius: 30,
     marginBottom: 60,
+    backgroundColor:"#ffffff33"
   },
   icon: {
     position: 'absolute',

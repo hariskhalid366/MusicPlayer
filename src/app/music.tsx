@@ -13,6 +13,7 @@ import {
   LayoutAnimation,
   StyleSheet,
   NativeModules,
+  LogBox,
 } from 'react-native';
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
 import RNFS from 'react-native-fs';
@@ -24,6 +25,7 @@ import LoadingTrack from '../components/loading';
 import { handleTrackPlayerSong } from '../utility/handleTrackChange';
 import { MusicFile } from '../constants/type';
 import { FlatList } from 'react-native-gesture-handler';
+import showToast from '../components/Toast';
 
 const { MusicFiles } = NativeModules;
 
@@ -84,6 +86,7 @@ const Main = () => {
         fetchMusicList();
       } else {
         Linking.openSettings();
+        showToast("Need permission to play music")
       }
     } catch (err) {
       console.log('Permission error:', err);
@@ -198,8 +201,8 @@ const Main = () => {
         showsVerticalScrollIndicator={false}
         initialNumToRender={20}
         maxToRenderPerBatch={25}
-        windowSize={15}
-        decelerationRate={0.4}
+        windowSize={50}
+        decelerationRate={0.6}
         removeClippedSubviews
         scrollEventThrottle={16}
         contentContainerStyle={styles.listContent}

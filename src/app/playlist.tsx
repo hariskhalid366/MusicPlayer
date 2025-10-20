@@ -5,10 +5,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import * as Icon from 'react-native-heroicons/outline';
-import {useMMKVObject} from 'react-native-mmkv';
-import {Storage} from '../service/Store';
+import { useMMKVObject } from 'react-native-mmkv';
+import { Storage } from '../service/Store';
 import PlayLIstItemView from '../components/PlayLIstItemView';
 import PlaylistModal from '../components/modal/PlaylistModal';
 import Header from '../components/Header';
@@ -73,51 +73,41 @@ const Playlist = () => {
     );
   };
 
-  const EmptyComponent = () => {
-    return (
-      <TouchableOpacity
-        onPress={() => setModal(true)}
-        className="absolute bottom-16 right-3 z-10 bg-white flex-row px-5 py-3 rounded-xl ">
-        <Icon.PlusIcon strokeWidth={2} color={'#000'} size={20} />
-        <Text className="text-sm text-black font-bold">Add Playlist</Text>
-      </TouchableOpacity>
-    );
-  };
+
 
   const validPlaylistSongs = playlistSongs || [];
 
   return (
-    <View className="flex-1">
-      {validPlaylistSongs.length > 0 && <EmptyComponent />}
-      {validPlaylistSongs.length > 0 ? (
-        <ScrollView
-          stickyHeaderIndices={[0]}
-          decelerationRate={0.6}
-          scrollEventThrottle={16}
-          contentContainerStyle={{
-            paddingHorizontal: 10,
-            paddingBottom: 150,
-          }}>
-          <Header title="Playlist" />
-          {validPlaylistSongs?.map((item, index) => (
-            <PlayLIstItemView key={index} {...{index, item, deletePlaylist}} />
-          ))}
-        </ScrollView>
-      ) : (
-        <>
-          <Header title="Playlist" />
-          <TouchableOpacity
-            onPress={() => setModal(true)}
-            className="justify-center items-center flex-1 rounded-2xl p-2 flex-row">
-            <Icon.PlusIcon color={'#fff'} size={23} />
-            <Text className="text-base text-white font-semibold tracking-wide">
-              Add Playlist
-            </Text>
-          </TouchableOpacity>
-        </>
-      )}
-      <PlaylistModal {...{modal, setModal, text, setText, createPlaylist}} />
-    </View>
+    <>
+      <ScrollView
+        stickyHeaderIndices={[0]}
+        decelerationRate={0.6}
+        scrollEventThrottle={16}
+        contentContainerStyle={{
+          paddingHorizontal: 10,
+          paddingBottom: 150,
+        }}>
+        <Header title="Playlist" playlist={true} onPress={() => setModal(true)} />
+        {validPlaylistSongs.length === 0 && 
+        < View
+          style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
+        <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#fff' }}>
+          Add Playlist 
+        </Text>
+    </View>}
+{
+  validPlaylistSongs?.map((item, index) => (
+    <PlayLIstItemView key={index} {...{ index, item, deletePlaylist }} />
+  ))
+}
+        </ScrollView >
+
+  <PlaylistModal {...{ modal, setModal, text, setText, createPlaylist }} />
+    </ >
   );
 };
 
