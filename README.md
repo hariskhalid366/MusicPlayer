@@ -48,7 +48,7 @@ It features background playback, queue management, liked songs, artists view, pl
 
 ## 🎬 Demo Video
 
-[![Watch the video](musicplayer.mp4)]
+[![Watch the video](./musicplayer.mp4)]
 > 🎥 Click above to see the app in action
 
 ---
@@ -71,4 +71,4 @@ Clone the repository:
 git clone https://github.com/yourusername/react-native-music-player.git
 cd react-native-music-player
 
-<p align="center"> Made with ❤️ by <b>Haris Khalid</b> using React Native </p>
+`Made with ❤️ by **Haris Khalid**`
