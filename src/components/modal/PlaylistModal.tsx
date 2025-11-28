@@ -5,6 +5,7 @@ import {
   Pressable,
   TextInput,
   TouchableOpacity,
+  StyleSheet,
 } from 'react-native';
 import React, { FC } from 'react';
 import { PlaylistModalProps } from '../../constants/type';
@@ -20,35 +21,28 @@ const PlaylistModal: FC<PlaylistModalProps> = ({
     <Modal transparent animationType='fade' visible={modal}>
       <Pressable
         onPress={() => setModal(false)}
-        className="flex-1 justify-center z-0 items-center bg-[#00000099]">
-        <View className="w-2/3 z-20 rounded-xl p-3 justify-between bg-zinc-800">
-          <Text className="text-white text-xl font-bold">
+        style={styles.backdrop}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.title}>
             Create a playlist
           </Text>
-          <View className="my-2 space-y-1">
-            <Text className="text-white font-semibold text-sm">Title</Text>
+          <View style={styles.inputSection}>
+            <Text style={styles.label}>Title</Text>
             <TextInput
               value={text}
               onChangeText={e => setText(e)}
               maxLength={160}
-              
               cursorColor={'#ffffff'}
-              style={{
-                borderBottomWidth: 2,
-                padding: 0,
-                borderBottomColor: '#fff',
-                color:"#fff",
-                fontWeight:"700"
-              }}
+              style={styles.input}
             />
-            <Text className="text-right text-white top-2">{text.length}/160</Text>
+            <Text style={styles.characterCount}>{text.length}/160</Text>
           </View>
-          <View className="flex-row items-center justify-end space-x-8 mt-4 mb-1 gap-4">
+          <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={() => setModal(false)}>
-              <Text className="text-white font-semibold">Cancel</Text>
+              <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => createPlaylist(text)}>
-              <Text className="text-white font-semibold">Create</Text>
+              <Text style={styles.buttonText}>Create</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -56,5 +50,60 @@ const PlaylistModal: FC<PlaylistModalProps> = ({
     </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#00000099',
+  },
+  modalContainer: {
+    width: '66.67%',
+    zIndex: 20,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    justifyContent: 'space-between',
+    backgroundColor: '#27272a',
+  },
+  title: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  inputSection: {
+    marginVertical: 8,
+  },
+  label: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  input: {
+    borderBottomWidth: 2,
+    paddingVertical: 0,
+    borderBottomColor: '#fff',
+    color: '#fff',
+    fontWeight: '700',
+  },
+  characterCount: {
+    textAlign: 'right',
+    color: '#fff',
+    marginTop: 8,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginTop: 16,
+    marginBottom: 4,
+    gap: 16,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+});
 
 export default PlaylistModal;

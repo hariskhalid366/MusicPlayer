@@ -1,16 +1,15 @@
-import React, {memo, useState, useEffect} from 'react'; // Added useState, useEffect
+import React, { memo, useState, useEffect } from 'react'; // Added useState, useEffect
 import {
   StyleProp,
   TouchableOpacity,
   ViewStyle,
   StyleSheet,
-  Image,
-} from 'react-native'; // Added Image
-import * as Icon from 'react-native-heroicons/outline';
+} from 'react-native';
+import * as Icon from 'lucide-react-native';
 import TrackPlayer, {
   useIsPlaying,
   useProgress,
-  RepeatMode, // Added RepeatMode
+  RepeatMode,
 } from 'react-native-track-player';
 import Slider from '@react-native-community/slider';
 
@@ -32,40 +31,37 @@ const styles = StyleSheet.create({
   },
 });
 
-const ControlButton = memo(({onPress, IconComponent, size, color}: any) => (
+const ControlButton = memo(({ onPress, IconComponent, size, color }: any) => (
   <TouchableOpacity style={styles.touchable} onPress={onPress}>
     <IconComponent size={size} color={color} strokeWidth={2} />
   </TouchableOpacity>
 ));
 
-export const Forward = ({size, color}: IconProps) => (
+export const Forward = ({ size, color }: IconProps) => (
   <ControlButton
     onPress={async () => {
-      await TrackPlayer.skipToNext().then(async()=>
-      await TrackPlayer.play()
-      );
-
+      await TrackPlayer.skipToNext().then(async () => await TrackPlayer.play());
     }}
-    IconComponent={Icon.ForwardIcon}
+    IconComponent={Icon.StepForward}
     size={size}
     color={color}
   />
 );
 
-export const Backward = ({size, color}: IconProps) => (
+export const Backward = ({ size, color }: IconProps) => (
   <ControlButton
     onPress={async () => {
-      await TrackPlayer.skipToPrevious().then(async()=>
-        await TrackPlayer.play()
+      await TrackPlayer.skipToPrevious().then(
+        async () => await TrackPlayer.play(),
       );
     }}
-    IconComponent={Icon.BackwardIcon}
+    IconComponent={Icon.StepBack}
     size={size}
     color={color}
   />
 );
 
-export const RepeatButton = ({size, color}: IconProps) => {
+export const RepeatButton = ({ size, color }: IconProps) => {
   const [repeatMode, setRepeatMode] = useState<RepeatMode>(RepeatMode.Off);
 
   useEffect(() => {
@@ -88,29 +84,25 @@ export const RepeatButton = ({size, color}: IconProps) => {
   const getRepeatIcon = () => {
     switch (repeatMode) {
       case RepeatMode.Track:
-        return require('../../assets/repeat-once.png'); // Use repeat-once icon
+        return Icon.Repeat1;
       case RepeatMode.Queue:
-        return require('../../assets/repeat.png'); // Use repeat icon (for queue)
+        return Icon.Repeat;
       default:
-        return require('../../assets/repeat.png'); // Use repeat icon (for off, maybe dimmed)
+        return Icon.Repeat;
     }
   };
 
   return (
-    <TouchableOpacity style={styles.touchable} onPress={toggleRepeatMode}>
-      <Image
-        source={getRepeatIcon()}
-        style={{
-          width: size,
-          height: size,
-          tintColor: repeatMode !== RepeatMode.Off ? color : '#ffffff80', // Dim if off
-        }}
-      />
-    </TouchableOpacity>
+    <ControlButton
+      IconComponent={getRepeatIcon()}
+      onPress={toggleRepeatMode}
+      color={repeatMode === RepeatMode.Off ? '#ffffff99' : '#fff'}
+      size={size}
+    />
   );
 };
 
-const PlayPause = ({size, color}: IconProps) => {
+const PlayPause = ({ size, color }: IconProps) => {
   const isPlaying = useIsPlaying();
   const togglePlayPause = () => {
     isPlaying.playing ? TrackPlayer.pause() : TrackPlayer.play();
@@ -128,8 +120,8 @@ const PlayPause = ({size, color}: IconProps) => {
 
 export default PlayPause;
 
-export const MusicSlider = ({style}: SliderStyleProps) => {
-  const {position, duration} = useProgress();
+export const MusicSlider = ({ style }: SliderStyleProps) => {
+  const { position, duration } = useProgress();
 
   return (
     <Slider

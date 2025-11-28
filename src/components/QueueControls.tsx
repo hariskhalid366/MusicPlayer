@@ -1,31 +1,48 @@
-import {Text, TouchableOpacity} from 'react-native';
+import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
-import * as Icon from 'react-native-heroicons/solid';
+import * as Icon from 'lucide-react-native';
 import TrackPlayer from 'react-native-track-player';
 
-const text = 'text-sm mx-1 font-semibold text-white tracking-wide';
-const controls =
-  'flex-row justify-center items-center bg-red-500 w-32  m-3 py-2 rounded-xl';
+const styles = StyleSheet.create({
+  text: {
+    fontSize: 14,
+    marginHorizontal: 4,
+    fontWeight: '600',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ef4444',
+    width: 128,
+    margin: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+});
 
-export const PlayAll = ({track}: any) => {
+export const PlayAll = ({ track }: any) => {
   return (
     <TouchableOpacity
-      className={controls}
+      style={styles.controls}
       onPress={() => {
         TrackPlayer.setQueue(track);
         TrackPlayer.play();
-      }}>
+      }}
+    >
       <Icon.PlayIcon size={23} color={'#fff'} />
-      <Text className={text}>Play</Text>
+      <Text style={styles.text}>Play</Text>
     </TouchableOpacity>
   );
 };
 
-export const ShuffleQueue = ({track}: any) => {
-  return (
-    <TouchableOpacity className={controls}>
-      <Icon.ArrowPathRoundedSquareIcon size={23} color={'#fff'} />
-      <Text className={text}>Shuffle</Text>
-    </TouchableOpacity>
-  );
-};
+// export const ShuffleQueue = ({ track }: any) => {
+//   return (
+//     <TouchableOpacity style={styles.controls}>
+//       <Icon.ArrowPathRoundedSquareIcon size={23} color={'#fff'} />
+//       <Text style={styles.text}>Shuffle</Text>
+//     </TouchableOpacity>
+//   );
+// };

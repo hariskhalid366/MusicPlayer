@@ -1,98 +1,101 @@
 import {
-  ScrollView,
+  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Image,
 } from 'react-native';
-import React, { useEffect } from 'react';
-import * as Icon from 'react-native-heroicons/solid';
-import { Storage } from '../service/Store';
-import { useMMKVObject } from 'react-native-mmkv';
+import { FlashList } from '@shopify/flash-list';
+const AnyFlashList: any = FlashList as unknown as any;
+import FastImage from 'react-native-fast-image';
+import React, { use, useEffect, useState } from 'react';
+import * as Icon from 'lucide-react-native';
 import Header from '../components/Header';
 import { MusicFile } from '../constants/type';
+import { useAudioStore } from '../store/useAudioStore';
 
 const Album = ({ navigation }: any) => {
-  const [music, setMusic] = useMMKVObject<string | MusicFile[]>(
-    'musicList',
-    Storage,
-  );
+  const [artist, setArtist] = useState<Record<string, MusicFile[]>>();
 
-  const [artist, setArtist] = useMMKVObject<Record<string, MusicFile[]>>(
-    'artistList',
-    Storage,
-  );
+  const { audios } = useAudioStore();
 
   useEffect(() => {
-    if (artist === undefined) {
-      if (Array.isArray(music)) {
-        // Group songs by artist
-        const grouped = music.reduce<Record<string, MusicFile[]>>(
-          (acc, track) => {
-            const artistKey = track.artist || 'Unknown Artist';
+    if (Array.isArray(audios)) {
+      const grouped = audios.reduce<Record<string, MusicFile[]>>(
+        (acc: Record<string, MusicFile[]>, track: MusicFile) => {
+          const artistKey = track.artist || 'Unknown Artist';
 
-            if (!acc[artistKey]) {
-              acc[artistKey] = [];
-            }
+          if (!acc[artistKey]) {
+            acc[artistKey] = [];
+          }
 
-            acc[artistKey].push(track);
+          acc[artistKey].push(track);
 
-            return acc;
-          },
-          {},
-        );
+          return acc;
+        },
+        {},
+      );
 
-        setArtist(grouped);
-      }
+      setArtist(grouped);
     }
-  }, [music, artist, setArtist]);
+  }, [audios]);
 
   return (
-      <ScrollView
-        stickyHeaderIndices={[0]}
-        showsVerticalScrollIndicator={false}
-        decelerationRate={0.6}
-        scrollEventThrottle={16}
-        contentContainerStyle={{
-          paddingVertical: 10,
-          paddingBottom: 100,
-        }}
-      >
-        <Header title="Artists" />
+    <FlatList
+      data={Object.entries(artist ?? {})}
+      keyExtractor={(item: [string, any]) => item[0]}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingVertical: 10,
+        paddingBottom: 100,
+      }}
+      stickyHeaderIndices={[0]}
+      ListHeaderComponent={<Header title="Artists" />}
+      renderItem={({ item, index }: any) => {
+        const [artistKey, songs] = item;
+        const name =
+          artistKey.length > 25 ? artistKey.slice(0, 25) + '...' : artistKey;
 
-        {Object.entries(artist || {}).map(([artistKey, songs]) => (
+        return (
           <TouchableOpacity
-            onPress={() => {
+            key={index}
+            onPress={() =>
               navigation.navigate('ArtistSongs', {
-                songs: songs,
-                name: artistKey.slice(0, 25) + '...',
-              });
-            }}
+                songs,
+                name,
+              })
+            }
             activeOpacity={0.7}
-            key={artistKey}
             style={styles.artistContainer}
           >
-            {songs[0].cover ? (
-              <Image source={{ uri: songs[0].cover }} style={styles.image} />
-            ) : (
-              <Icon.UserIcon
+            <View style={styles.imageContainer}>
+              <Icon.UserRound
                 color={'#fff'}
-                size={50}
-                style={styles.defaultIcon}
+                size={42}
+                strokeWidth={1.5}
+                style={{ position: 'absolute' }}
               />
-            )}
+              {songs[0]?.cover && (
+                <FastImage
+                  source={{ uri: songs[0].cover }}
+                  style={styles.image}
+                  resizeMode={FastImage.resizeMode.cover}
+                />
+              )}
+            </View>
             <Text style={styles.artistText}>{artistKey}</Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+        );
+      }}
+      // estimatedItemSize={90}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   headerContainer: {
-    height: 80, // Adjust as needed
-    backgroundColor: '#000', // Ensure visibility
+    height: 80,
+    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -101,25 +104,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
     paddingHorizontal: 20,
-
+    gap: 16,
   },
   image: {
-    width: 55,
-    height: 55,
-    borderRadius: 30,
-    marginRight: 16,
-    backgroundColor:"#ffffff55"
-  },
-  defaultIcon: {
-    marginRight: 16,
-    backgroundColor: '#1F1F1F',
-    borderRadius: 25,
+    flex: 1,
+    aspectRatio: 1,
   },
   artistText: {
     flex: 1,
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  imageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 30,
+    width: 55,
+    height: 55,
+    overflow: 'hidden',
+    backgroundColor: '#ffffff11',
   },
 });
 

@@ -5,17 +5,19 @@ export type MusicFile = {
   duration: number;
   title: string;
   url: string;
+  liked?: boolean;
 };
 
 export type ListItemProps = {
   item: MusicFile;
   index: number;
   handleTrack: (track: MusicFile) => void;
-  deleteItem?: (track: MusicFile) => void;
+  isActive?: any;
   playlist?: boolean;
   isSelected?: boolean; // Added isSelected prop
+  isPlaying?: boolean;
   selectionModeActive?: boolean; // Added to know if selection mode is on
-}
+};
 
 export type PlaylistModalProps = {
   modal: boolean;
@@ -23,4 +25,4 @@ export type PlaylistModalProps = {
   text: string;
   setText: (value: string) => void;
   createPlaylist: (text: string) => void;
-}
+};

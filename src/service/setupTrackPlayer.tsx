@@ -10,22 +10,21 @@ interface SetupTrackPlayer {
 }
 
 const setupTrack = async () => {
-    try {
-      await TrackPlayer.setupPlayer({
-        maxCacheSize: 1024 * 30,
-        androidAudioContentType: AndroidAudioContentType.Sonification,
-        backBuffer:5,
-        playBuffer:5,
-        maxBuffer:100
-      });
+  try {
+    await TrackPlayer.setupPlayer({
+      maxCacheSize: 1024 * 30,
+      androidAudioContentType: AndroidAudioContentType.Sonification,
+      backBuffer: 5,
+      playBuffer: 5,
+      maxBuffer: 100,
+    });
 
-      await TrackPlayer.setRepeatMode(RepeatMode.Queue);
-      console.log('Track Player setup complete');
-      return undefined;
-    } catch (error: any) {
-      console.log('Error setting up Track Player:', error);
-      return error?.code;
-    }
+    await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+    console.log('Track Player setup complete');
+  } catch (error: any) {
+    console.log('Error setting up Track Player:', error);
+    return error?.code;
+  }
 };
 
 export const useSetupTrackPlayer = ({ onLoad, Track }: SetupTrackPlayer) => {
@@ -65,43 +64,3 @@ export const useSetupTrackPlayer = ({ onLoad, Track }: SetupTrackPlayer) => {
     };
   }, [onLoad, Track]);
 };
-
-
-// import {useEffect, useRef} from 'react';
-// import TrackPlayer, {
-//   AndroidAudioContentType,
-//   RepeatMode,
-// } from 'react-native-track-player';
-
-// const setupTrack = async () => {
-//   await TrackPlayer.setupPlayer({
-//       maxCacheSize: 1024 * 30,
-//       androidAudioContentType: AndroidAudioContentType.Sonification,
-//       backBuffer:20,
-//       playBuffer:60,
-//       maxBuffer:100
-//   });
-//   await TrackPlayer.setRepeatMode(RepeatMode.Queue);
-// };
-
-// interface SetupTrackPlayer {
-//   onLoad?: () => void;
-//   Track: any;
-// }
-
-// export const useSetupTrackPlayer = ({onLoad, Track}: SetupTrackPlayer) => {
-//   const isInitialize = useRef(false);
-
-//   useEffect(() => {
-//     setupTrack()
-//       .then(() => {
-//         isInitialize.current = true;
-//         onLoad?.();
-//         TrackPlayer.add(Track);
-//       })
-//       .catch(err => {
-//         isInitialize.current = false;
-//         console.log(err);
-//       });
-//   }, [onLoad]);
-// };

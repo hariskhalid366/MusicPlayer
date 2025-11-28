@@ -1,14 +1,13 @@
 import React, { memo, useMemo, useCallback } from 'react';
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import * as Icon from 'react-native-heroicons/outline';
-import * as IconSolid from 'react-native-heroicons/solid';
+import FastImage from 'react-native-fast-image';
+import * as Icon from 'lucide-react-native';
 import {
   Track,
   useActiveTrack,
@@ -22,7 +21,7 @@ import PlayPause, {
   RepeatButton,
 } from '../components/PlayerControls';
 import { useMMKVObject } from 'react-native-mmkv';
-import { Storage } from '../service/Store';
+import { Storage } from '../store/storage';
 
 const { width } = Dimensions.get('screen');
 const size = width - 60;
@@ -75,13 +74,14 @@ const FloatingScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image
+      <FastImage
         style={styles.trackImage}
         source={
           track?.cover
             ? { uri: track?.cover }
             : require('../../assets/tile.jpeg')
         }
+        resizeMode={FastImage.resizeMode.cover}
       />
       <View style={styles.icon}>
         {playing ? (
@@ -100,13 +100,12 @@ const FloatingScreen = () => {
           style={styles.likeButton}
         >
           {isLiked(track.url) ? (
-            <IconSolid.HeartIcon size={23} color={'red'} />
+            <Icon.HeartIcon size={23} color={'#e60028'} fill={'#e60028'} />
           ) : (
             <Icon.HeartIcon size={23} color={'#fff'} />
           )}
         </TouchableOpacity>
-         <RepeatButton size={20} color='#fff'/>
-
+        <RepeatButton size={20} color="#fff" />
       </View>
       <MusicSlider style={styles.musicSlider} />
       <View style={styles.timeContainer}>
@@ -136,7 +135,7 @@ const styles = StyleSheet.create({
     height: size,
     borderRadius: 30,
     marginBottom: 60,
-    backgroundColor:"#ffffff33"
+    backgroundColor: '#ffffff33',
   },
   icon: {
     position: 'absolute',
@@ -183,14 +182,13 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   counterText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 14,
-    fontWeight: "600"
+    fontWeight: '600',
   },
   titleText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 15,
-    fontWeight: "bold",
-
-  }
+    fontWeight: 'bold',
+  },
 });

@@ -5,30 +5,32 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Image,
   ToastAndroid,
 } from 'react-native';
 import React, { FC } from 'react';
-import * as Icon from 'react-native-heroicons/solid';
-import {useMMKVObject} from 'react-native-mmkv';
-import {Storage} from '../../service/Store';
-import {PlaylistProps} from '../../app/playlist';
+import FastImage from 'react-native-fast-image';
+import * as Icon from 'lucide-react-native';
+import { useMMKVObject } from 'react-native-mmkv';
+import { Storage } from '../../store/storage';
+import { PlaylistProps } from '../../app/playlist';
 import { MusicFile } from '../../constants/type';
 import Header from '../Header';
 
-interface AddSongModalProps{
-  isVisible: boolean,
-  currentTrack: MusicFile | null,
-  setIsVisible: (value: boolean) => void,
-  setCurrentTrack: (value: MusicFile | null) => void
-
+interface AddSongModalProps {
+  isVisible: boolean;
+  currentTrack: MusicFile | null;
+  setIsVisible: (value: boolean) => void;
+  setCurrentTrack: (value: MusicFile | null) => void;
 }
 
-const AddSongModal:FC<AddSongModalProps> = ({isVisible,setIsVisible,setCurrentTrack,currentTrack}) => {
+const AddSongModal: FC<AddSongModalProps> = ({
+  isVisible,
+  setIsVisible,
+  setCurrentTrack,
+  currentTrack,
+}) => {
   const [playlistSongs, setPlaylistSongs] =
     useMMKVObject<PlaylistProps[]>('playlist', Storage) || [];
-
-
 
   const validPlaylistSongs = playlistSongs || [];
 
@@ -65,34 +67,33 @@ const AddSongModal:FC<AddSongModalProps> = ({isVisible,setIsVisible,setCurrentTr
     );
   };
 
-  const onClose=()=>{
-     setIsVisible(false);
-     setCurrentTrack(null);
-  }
+  const onClose = () => {
+    setIsVisible(false);
+    setCurrentTrack(null);
+  };
 
   return (
     <Modal
       transparent
       statusBarTranslucent
-      animationType='slide'
+      animationType="slide"
       onRequestClose={onClose}
-      visible={isVisible}>
-      <View className="flex-1 justify-end items-center bg-red-500/30">
-        <View className="h-screen bg-black w-full rounded-t-3xl">
-          <TouchableOpacity
-            onPress={onClose}
-            style={styles.touchable}>
-            <Icon.XMarkIcon color={'#fff'} size={23} />
+      visible={isVisible}
+    >
+      <View style={styles.outerContainer}>
+        <View style={styles.innerContainer}>
+          <TouchableOpacity onPress={onClose} style={styles.touchable}>
+            <Icon.X color={'#fff'} size={23} />
           </TouchableOpacity>
           <ScrollView
             decelerationRate={0.6}
             scrollEventThrottle={16}
             stickyHeaderIndices={[0]}
-          
             contentContainerStyle={{
               paddingHorizontal: 10,
-            }}>
-              <Header title="Add to Playlist" />
+            }}
+          >
+            <Header title="Add to Playlist" />
             {validPlaylistSongs.map((item, index) => (
               <TouchableOpacity
                 onPress={() => {
@@ -103,16 +104,19 @@ const AddSongModal:FC<AddSongModalProps> = ({isVisible,setIsVisible,setCurrentTr
                 }}
                 key={index}
                 activeOpacity={0.8}
-                style={styles.container}>
-                <Image
+                style={styles.container}
+              >
+                <FastImage
                   style={styles.image}
                   source={require('../../../assets/playlist.jpeg')}
+                  resizeMode={FastImage.resizeMode.cover}
                 />
                 <View style={styles.infoContainer}>
                   <Text
                     style={styles.title}
                     numberOfLines={2}
-                    ellipsizeMode="tail">
+                    ellipsizeMode="tail"
+                  >
                     {item.id}
                   </Text>
                   <Text style={styles.artist} numberOfLines={1}>
@@ -131,6 +135,19 @@ const AddSongModal:FC<AddSongModalProps> = ({isVisible,setIsVisible,setCurrentTr
 export default AddSongModal;
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    backgroundColor: '#FF00003C',
+  },
+  innerContainer: {
+    height: '100%',
+    backgroundColor: '#000',
+    width: '100%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+  },
   touchable: {
     alignSelf: 'flex-end',
     padding: 8,

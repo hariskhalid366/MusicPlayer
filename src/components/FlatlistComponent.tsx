@@ -1,76 +1,76 @@
-import {Dimensions, FlatList, Text, View} from 'react-native';
-import React, {memo, useCallback} from 'react';
-import ListView  from './ListView';
-import {handleTrackPlayerSong} from '../utility/handleTrackChange';
+import { Text, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+const AnyFlashList: any = FlashList as unknown as any;
+import React, { memo, useCallback, useMemo } from 'react';
+import ListView from './ListView';
+import { handleTrackPlayerSong } from '../utility/handleTrackChange';
 import { MusicFile } from '../constants/type';
+import { useActiveTrack, useIsPlaying } from 'react-native-track-player';
 
 interface FlatlistItemProps {
   id: string;
   items: MusicFile[];
-  queueId: string | undefined;
   setLoading: (value: boolean) => void;
-  setQueueId: (text: string) => void;
   ListHeaderComponent?: React.ReactElement | null; // Optional header component
 }
+
+const ITEM_HEIGHT = 82; // fixed row height to make getItemLayout possible
+const HEADER_HEIGHT = 56; // approximate header height when provided
 
 const FlatlistComponent = ({
   id,
   items,
-  queueId,
   setLoading,
-  setQueueId,
-  ListHeaderComponent, // Destructure the optional header component
+  ListHeaderComponent,
 }: FlatlistItemProps) => {
+  const activeTrack = useActiveTrack();
+  const { playing } = useIsPlaying();
+
   const onHandleTrackPlayerSong = useCallback(
     async (selectedTrack: MusicFile) => {
-      return await handleTrackPlayerSong(
-        selectedTrack,
-        items,
-        id,
-        queueId,
-        setQueueId,
-        setLoading,
-      );
+      return await handleTrackPlayerSong(selectedTrack, items, id, setLoading);
     },
-    [id, items, queueId, setQueueId],
+    [id, items, setLoading],
   );
 
-  const {height} = Dimensions.get('screen');
+  const renderItem = useCallback(
+    ({ item, index }: any) =>
+      item.header && ListHeaderComponent ? (
+        <View>{ListHeaderComponent}</View>
+      ) : (
+        <ListView
+          isActive={activeTrack?.url === item?.url}
+          isPlaying={playing}
+          item={item}
+          index={index}
+          handleTrack={onHandleTrackPlayerSong}
+        />
+      ),
+    [playing, activeTrack?.url, onHandleTrackPlayerSong, ListHeaderComponent],
+  );
 
-  // Combine the header component with the list data if the header is provided
-  const combinedData = ListHeaderComponent ? [{header: true}, ...items] : items;
+  const combinedData = useMemo(
+    () => (ListHeaderComponent ? [{ header: true }, ...items] : items),
+    [items, ListHeaderComponent],
+  );
 
   return (
-    <FlatList
+    <AnyFlashList
       data={combinedData}
-      keyExtractor={(item: any, index) =>
+      keyExtractor={(item: any, index: number) =>
         item?.url ? item.url : `header-${index}`
       }
-      renderItem={({item, index}) =>
-        item.header && ListHeaderComponent ? (
-          <View>{ListHeaderComponent}</View> // Wrap the header in a View
-        ) : (
-          <ListView
-            key={item.url}
-            index={index}
-            item={item}
-            playlist={true}
-            handleTrack={onHandleTrackPlayerSong}
-            // isSelected={false}
-            // onLongPress={() => {}}
-            // selectionModeActive={false}
-          />
-        )
-      }
-      stickyHeaderIndices={ListHeaderComponent ? [0] : undefined} // Make the first index sticky if there's a header
+      renderItem={renderItem}
+      stickyHeaderIndices={ListHeaderComponent ? [0] : undefined}
       ListEmptyComponent={() => (
         <View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
-          }}>
-          <Text style={{fontSize: 16, fontWeight: 'bold', color: '#fff'}}>
+          }}
+        >
+          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#fff' }}>
             No songs added
           </Text>
         </View>
@@ -78,16 +78,28 @@ const FlatlistComponent = ({
       showsVerticalScrollIndicator={false}
       maintainVisibleContentPosition={{
         autoscrollToTopThreshold: 10,
-        minIndexForVisible: 20,
       }}
-      windowSize={50}
-      maxToRenderPerBatch={10}
+      estimatedItemSize={ITEM_HEIGHT}
+      removeClippedSubviews={true}
+      getItemLayout={(data: any, index: number) => {
+        const isHeader = data && data[0] && data[0].header && index === 0;
+        if (isHeader) {
+          return {
+            length: HEADER_HEIGHT,
+            offset: HEADER_HEIGHT * index,
+            index,
+          };
+        }
+        const headerOffset =
+          data && data[0] && data[0].header ? HEADER_HEIGHT : 0;
+        const offset =
+          headerOffset +
+          ITEM_HEIGHT * (data && data[0] && data[0].header ? index - 1 : index);
+        return { length: ITEM_HEIGHT, offset, index };
+      }}
       decelerationRate={0.6}
       scrollEventThrottle={16}
-      contentContainerStyle={{
-        paddingHorizontal: 10,
-        paddingBottom: 150,
-      }}
+      contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 150 }}
     />
   );
 };

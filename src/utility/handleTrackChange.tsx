@@ -1,15 +1,16 @@
 import TrackPlayer from 'react-native-track-player';
 import { MusicFile } from '../constants/type';
 import showToast from '../components/Toast';
+import { mmkvStorage } from '../store/storage';
 
 export const handleTrackPlayerSong = async (
   selectedTrack: MusicFile,
   songs: MusicFile[],
   id: string,
-  queueId: string | undefined,
-  setQueueId: (id: string) => void,
+
   setLoading: (loading: boolean) => void,
 ) => {
+  const queueId = mmkvStorage.getItem('queueId');
   try {
     const trackIndex = songs?.findIndex(
       track => track.url === selectedTrack.url,
@@ -24,24 +25,20 @@ export const handleTrackPlayerSong = async (
     if (isChangingQueue) {
       setLoading(true);
 
-      await TrackPlayer.reset(),
+      (await TrackPlayer.reset(),
         await TrackPlayer.setQueue(songs),
         await TrackPlayer.skip(trackIndex),
-        setLoading(false);
+        setLoading(false));
 
-      setQueueId(id);
+      mmkvStorage.setItem('queueId', id);
     } else {
       await TrackPlayer.skip(trackIndex);
     }
     await TrackPlayer.play();
   } catch (error) {
-    
-     setLoading(false)
-     showToast("Player is not ready")
-    
+    setLoading(false);
+    showToast('Player is not ready');
+
     console.log('Error handling track change:', error);
   }
 };
-
-
-

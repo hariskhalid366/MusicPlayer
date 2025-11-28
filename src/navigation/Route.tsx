@@ -1,55 +1,48 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, AppStateStatus, TouchableOpacity } from 'react-native';
+import React, { memo, useCallback, useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabs from './BottomTabs';
 import BootSplash from 'react-native-bootsplash';
 import { useSetupTrackPlayer } from '../service/setupTrackPlayer';
 import { useLogTrackPlayerState } from '../service/trackPayerEvents';
-import { useMMKVObject } from 'react-native-mmkv';
-import { Storage } from '../service/Store';
 import FloatingScreen from '../app/floatingscreen';
-import * as Icon from 'react-native-heroicons/outline';
+import * as Icon from 'lucide-react-native';
 import ArtistsSongs from '../app/artistsSongs';
 import PlaylistSongs from '../app/playlistSongs';
-import { MusicFile } from '../constants/type';
 import FloatingTrack from '../components/FloatingTrack';
+import { useAudioStore } from '../store/useAudioStore';
+import { mmkvStorage } from '../store/storage';
 
+const Stack = createNativeStackNavigator();
 const Route = () => {
-  const [music, setMusic] = useMMKVObject<string | MusicFile[]>(
-    'musicList',
-    Storage,
-  );
-  
-  const Stack = createNativeStackNavigator();
+  const { audios } = useAudioStore();
+  const [routeState, setRouteState] = useState<any>('index');
 
   const [isInitialized, setIsInitialized] = React.useState(false);
+  mmkvStorage.setItem('queueId', 'songs');
 
   const init = useCallback(async () => {
     if (!isInitialized) {
-      console.log('Initializing app...');
       await BootSplash.hide({ fade: true });
-      console.log('BootSplash hidden');
       setIsInitialized(true);
     }
   }, [isInitialized]);
 
   useSetupTrackPlayer({
     onLoad: init,
-    Track: music,
+    Track: audios,
   });
 
   useLogTrackPlayerState();
-  const [routeState,setRouteState] =useState<any>("index")
 
   return (
     <NavigationContainer
-     onStateChange={(state) => {
-       setRouteState(state?.routes[state.index].name);
-    }}
+      onStateChange={state => {
+        setRouteState(state?.routes[state.index].name);
+      }}
       onReady={() => {
-        console.log('Navigation ready');
-        init()
+        init();
       }}
       theme={{
         dark: true,
@@ -93,36 +86,47 @@ const Route = () => {
             },
             headerTitleAlign: 'center',
             presentation: 'fullScreenModal',
-            headerLeft: () =>
+            headerLeft: () => (
               <TouchableOpacity
                 onPress={() => {
                   navigation.pop();
                 }}
-                style={{ padding: 2, borderRadius: 200, backgroundColor: '#ffffff21' }}
+                style={{
+                  padding: 2,
+                  borderRadius: 200,
+                  backgroundColor: '#ffffff21',
+                }}
               >
-                <Icon.ChevronDownIcon size={23} color={'#fff'} strokeWidth={2} />
+                <Icon.ChevronDown size={23} color={'#fff'} strokeWidth={2} />
               </TouchableOpacity>
+            ),
           })}
         />
         <Stack.Screen
           name="ArtistSongs"
           component={ArtistsSongs}
-          options={({ navigation }) => ({
+          options={({ navigation, route }) => ({
+            headerShown: true,
             headerTitleStyle: {
               fontSize: 18,
-              fontWeight: '500',
+              fontWeight: '800',
             },
             headerTitleAlign: 'center',
             presentation: 'fullScreenModal',
-            headerLeft: () =>
+            headerLeft: () => (
               <TouchableOpacity
                 onPress={() => {
                   navigation.pop();
                 }}
-                style={{ padding: 2, borderRadius: 200, backgroundColor: '#ffffff21' }}
+                style={{
+                  padding: 2,
+                  borderRadius: 200,
+                  backgroundColor: '#ffffff21',
+                }}
               >
-                <Icon.ChevronDownIcon size={23} color={'#fff'} strokeWidth={2} />
+                <Icon.ChevronDown size={23} color={'#fff'} strokeWidth={2} />
               </TouchableOpacity>
+            ),
           })}
         />
         <Stack.Screen
@@ -135,21 +139,25 @@ const Route = () => {
             },
             headerTitleAlign: 'center',
             presentation: 'fullScreenModal',
-            headerLeft: () =>
+            headerLeft: () => (
               <TouchableOpacity
                 onPress={() => {
                   navigation.pop();
                 }}
-                style={{ padding: 2, borderRadius: 200, backgroundColor: '#ffffff21' }}
+                style={{
+                  padding: 2,
+                  borderRadius: 200,
+                  backgroundColor: '#ffffff21',
+                }}
               >
-                <Icon.ChevronDownIcon size={23} color={'#fff'} strokeWidth={2} />
+                <Icon.ChevronDown size={23} color={'#fff'} strokeWidth={2} />
               </TouchableOpacity>
+            ),
           })}
         />
       </Stack.Navigator>
       <FloatingTrack floatName={routeState} />
     </NavigationContainer>
-    
   );
 };
 

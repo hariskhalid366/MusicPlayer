@@ -1,13 +1,14 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
-import * as Icon from 'react-native-heroicons/outline';
-import {useNavigation} from '@react-navigation/native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import React, { memo } from 'react';
+import * as Icon from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 import Animated, {
   Extrapolation,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 import { MusicFile } from '../constants/type';
 
@@ -20,7 +21,7 @@ interface ItemProps {
   deletePlaylist: (value: string) => void;
 }
 
-const PlayLIstItemView = ({item, index, deletePlaylist}: ItemProps) => {
+const PlayLIstItemView = ({ item, index, deletePlaylist }: ItemProps) => {
   const nav: any = useNavigation();
 
   const dropDown = useSharedValue(0);
@@ -28,38 +29,40 @@ const PlayLIstItemView = ({item, index, deletePlaylist}: ItemProps) => {
     const height = interpolate(
       dropDown.value,
       [0, 1],
-      [0, 45], // Increased height for better visibility
+      [0, 45],
       Extrapolation.CLAMP,
     );
 
     return {
       height,
-      opacity: dropDown.value, // Adjust opacity for smoother transition
+      opacity: dropDown.value,
     };
   });
 
   const toggleDropdown = () => {
     if (dropDown.value === 0) {
-      dropDown.value = withSpring(1, {damping: 20});
+      dropDown.value = withTiming(1, { duration: 200 });
 
       setTimeout(() => {
-        dropDown.value = withSpring(0, {damping: 20});
+        dropDown.value = withTiming(0, { duration: 200 });
       }, 5000);
     } else {
-      dropDown.value = withSpring(0, {damping: 20});
+      dropDown.value = withTiming(0, { duration: 200 });
     }
   };
 
   return (
     <>
       <TouchableOpacity
-        onPress={() => nav.navigate('PlaylistSongs', {item})}
+        onPress={() => nav.navigate('PlaylistSongs', { item })}
         key={index}
         activeOpacity={0.8}
-        style={styles.container}>
-        <Image
+        style={styles.container}
+      >
+        <FastImage
           style={styles.image}
           source={require('../../assets/playlist.jpeg')}
+          resizeMode={FastImage.resizeMode.cover}
         />
 
         <View style={styles.infoContainer}>
@@ -72,8 +75,9 @@ const PlayLIstItemView = ({item, index, deletePlaylist}: ItemProps) => {
         </View>
         <TouchableOpacity
           onPress={() => toggleDropdown()}
-          style={styles.moreButton}>
-          <Icon.EllipsisHorizontalIcon color="#fff" size={22} />
+          style={styles.moreButton}
+        >
+          <Icon.Ellipsis color="#fff" size={22} />
         </TouchableOpacity>
       </TouchableOpacity>
       <Animated.View style={[animatedStyles, styles.dropdownContainer]}>
@@ -82,13 +86,15 @@ const PlayLIstItemView = ({item, index, deletePlaylist}: ItemProps) => {
             // setIsVisible(true);
             // setCurrentTrack(item);
           }}
-          style={styles.dropdownItem}>
+          style={styles.dropdownItem}
+        >
           <Icon.PlayIcon size={22} color={'#fff'} />
           <Text style={styles.dropdownText}>Play All</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => deletePlaylist(item.id)}
-          style={styles.dropdownItem}>
+          style={styles.dropdownItem}
+        >
           <Icon.TrashIcon size={22} color={'#fff'} />
           <Text style={styles.dropdownText}>Delete Playlist</Text>
         </TouchableOpacity>
@@ -97,7 +103,18 @@ const PlayLIstItemView = ({item, index, deletePlaylist}: ItemProps) => {
   );
 };
 
-export default PlayLIstItemView;
+// avoid rerenders unless playlist id or songs length change
+const areEqual = (
+  prev: Readonly<React.ComponentProps<typeof PlayLIstItemView>>,
+  next: Readonly<React.ComponentProps<typeof PlayLIstItemView>>,
+) => {
+  return (
+    prev.item.id === next.item.id &&
+    prev.item.songs.length === next.item.songs.length
+  );
+};
+
+export default memo(PlayLIstItemView, areEqual);
 
 const styles = StyleSheet.create({
   container: {

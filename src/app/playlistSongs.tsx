@@ -1,13 +1,11 @@
-import {View} from 'react-native';
-import React, {useLayoutEffect, useState} from 'react';
+import { View } from 'react-native';
+import React, { useLayoutEffect, useState } from 'react';
 
-import {useMMKVString} from 'react-native-mmkv';
-import {Storage} from '../service/Store';
-import {PlaylistProps} from './playlist';
+import { PlaylistProps } from './playlist';
 import LoadingTrack from '../components/loading';
 import FlatlistComponent from '../components/FlatlistComponent';
 
-const PlaylistSongs = ({navigation, route}: any) => {
+const PlaylistSongs = ({ navigation, route }: any) => {
   const items: PlaylistProps = route.params.item;
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -17,18 +15,11 @@ const PlaylistSongs = ({navigation, route}: any) => {
 
   const id = items?.id;
   const [loading, setLoading] = useState(false);
-  const [queueId, setQueueId] = useMMKVString('queueId', Storage);
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       {loading && <LoadingTrack />}
-      <FlatlistComponent
-        items={items.songs}
-        id={id}
-        queueId={queueId}
-        setLoading={setLoading}
-        setQueueId={setQueueId}
-      />
+      <FlatlistComponent items={items.songs} id={id} setLoading={setLoading} />
     </View>
   );
 };

@@ -1,18 +1,14 @@
-import {
-  ScrollView,
-  Text,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { FlatList, Text, ToastAndroid, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+const AnyFlashList: any = FlashList as unknown as any;
 import React, { useState } from 'react';
-import * as Icon from 'react-native-heroicons/outline';
 import { useMMKVObject } from 'react-native-mmkv';
-import { Storage } from '../service/Store';
+import { Storage } from '../store/storage';
 import PlayLIstItemView from '../components/PlayLIstItemView';
 import PlaylistModal from '../components/modal/PlaylistModal';
 import Header from '../components/Header';
 import { MusicFile } from '../constants/type';
+import showToast from '../components/Toast';
 
 export interface PlaylistProps {
   id: string;
@@ -20,7 +16,6 @@ export interface PlaylistProps {
 }
 
 const Playlist = () => {
-  // Initialize playlistSongs as an empty array if undefined
   const [playlistSongs, setPlaylistSongs] =
     useMMKVObject<PlaylistProps[]>('playlist', Storage) || [];
   const [modal, setModal] = useState(false);
@@ -46,15 +41,10 @@ const Playlist = () => {
     );
 
     if (playlistExists) {
-      ToastAndroid.showWithGravity(
-        'Playlist Already Exists',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
+      showToast('Playlist Already Exists');
       return;
     }
 
-    // Update playlistSongs with the new playlist
     setPlaylistSongs(prev => [...(prev || []), newPlaylist]);
     setText('');
     setModal(false);
@@ -65,49 +55,59 @@ const Playlist = () => {
       playlist => playlist.id !== playlistName,
     );
     setPlaylistSongs(updatePlaylist);
-
-    ToastAndroid.showWithGravity(
-      'Playlist removed',
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER,
-    );
+    showToast('Playlist removed');
   };
-
-
 
   const validPlaylistSongs = playlistSongs || [];
 
   return (
     <>
-      <ScrollView
+      <FlatList
         stickyHeaderIndices={[0]}
         decelerationRate={0.6}
         scrollEventThrottle={16}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,
-        }}>
-        <Header title="Playlist" playlist={true} onPress={() => setModal(true)} />
-        {validPlaylistSongs.length === 0 && 
-        < View
-          style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#fff' }}>
-          Add Playlist 
-        </Text>
-    </View>}
-{
-  validPlaylistSongs?.map((item, index) => (
-    <PlayLIstItemView key={index} {...{ index, item, deletePlaylist }} />
-  ))
-}
-        </ScrollView >
+        }}
+        data={validPlaylistSongs}
+        renderItem={({
+          item,
+          index,
+        }: {
+          item: PlaylistProps;
+          index: number;
+        }) => <PlayLIstItemView {...{ index, item, deletePlaylist }} />}
+        keyExtractor={(item: any) => item.id}
+        // estimatedItemSize={132}
+        removeClippedSubviews={true}
+        getItemLayout={(_data: any, index: number) => ({
+          length: 132,
+          offset: 132 * index,
+          index,
+        })}
+        ListHeaderComponent={
+          <Header
+            title="Playlist"
+            playlist={true}
+            onPress={() => setModal(true)}
+          />
+        }
+        ListEmptyComponent={
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: '#fff' }}>Hello</Text>
+          </View>
+        }
+      />
 
-  <PlaylistModal {...{ modal, setModal, text, setText, createPlaylist }} />
-    </ >
+      <PlaylistModal {...{ modal, setModal, text, setText, createPlaylist }} />
+    </>
   );
 };
 

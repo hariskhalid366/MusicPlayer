@@ -1,107 +1,84 @@
-import {Text, TextInput, TouchableOpacity, View} from 'react-native';
-import React from 'react';
-import * as Icon from 'react-native-heroicons/solid';
-import Animated, {
-  Easing,
-  Extrapolation,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from 'react-native';
+import React, { memo } from 'react';
+import * as Icon from 'lucide-react-native';
+
 import { MusicFile } from '../constants/type';
 
 type ContainerProps = {
   title: string;
   search: string;
   setSearch: (item: string) => void;
-  track?: MusicFile[] | string;
+  track?: MusicFile[];
 };
 
-const HeaderSearchBar = ({search, setSearch, title}: ContainerProps) => {
-  const searchVal = useSharedValue(0);
-  const ATouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
-
-  const animatedSearchStyle = useAnimatedStyle(() => {
-    const height = interpolate(
-      searchVal.value,
-      [0, 1],
-      [0, 45],
-      Extrapolation.CLAMP,
-    );
-
-    return {
-      height,
-    };
-  });
-
-  const opacityStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      searchVal.value,
-      [0, 1],
-      [0, 1],
-      Extrapolation.CLAMP,
-    );
-
-    return {
-      opacity: withTiming(opacity, {duration: 200}),
-    };
-  });
-
-  const searchValue = () => {
-    if (searchVal.value === 0) {
-      searchVal.value = withTiming(1, {
-        duration: 100,
-        easing:Easing.out(Easing.ease)
-
-      });
-    } else {
-      searchVal.value = withTiming(0, {
-        duration: 60,
-        easing:Easing.ease
-        
-      });
-    }
-    setSearch('');
-  };
-
+const HeaderSearchBar = ({ search, setSearch, title }: ContainerProps) => {
   return (
-    <View className="px-2.5 mx-[10px]">
-      <View className="flex-row justify-between h-[60px] z-10 items-center">
-        <Text className="font-semibold text-3xl items-center text-white tracking-wide">
-          {title}
-        </Text>
-        <TouchableOpacity onPress={searchValue}>
-          <Icon.MagnifyingGlassIcon size={23} strokeWidth={2} color={'#fff'} />
-        </TouchableOpacity>
+    <View style={styles.outerContainer}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>{title}</Text>
       </View>
-      <Animated.View
-        style={animatedSearchStyle}
-        className="rounded-xl my-3 overflow-hidden bg-[#ffffff33] px-2 items-center flex-row">
+
+      <View style={styles.searchContainer}>
         <TextInput
           value={search}
-          onChangeText={e => setSearch(e)}
-          placeholder="Search songs"
-          placeholderTextColor={'#ffffff99'}
-          style={{color: '#fff'}}
-          className="flex-1 text-[15px]"
+          onChangeText={setSearch}
+          placeholder="Search"
+          placeholderTextColor="#ffffff99"
+          style={styles.textInput}
         />
-
-        <ATouchableOpacity
-          style={opacityStyle}
-          onPress={() => {
-            if (search.length > 0) {
+        {search.length > 0 && (
+          <TouchableOpacity
+            style={{ justifyContent: 'center', paddingHorizontal: 2 }}
+            onPress={() => {
               setSearch('');
-            } else {
-              searchValue();
-            }
-          }}>
-          <Icon.XMarkIcon size={25} strokeWidth={2} color={'#fff'} />
-        </ATouchableOpacity>
-      </Animated.View>
+            }}
+          >
+            <Icon.X size={20} color="#fff" />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
 
-export default HeaderSearchBar;
+export default memo(HeaderSearchBar);
+
+const styles = StyleSheet.create({
+  outerContainer: {
+    paddingHorizontal: 14,
+    height: 120,
+    borderBottomWidth: 0.6,
+    borderBottomColor: '#ffffff11',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: 60,
+    alignItems: 'center',
+  },
+  title: {
+    fontWeight: '700',
+    fontSize: 28,
+    color: '#fff',
+    letterSpacing: 0.8,
+  },
+  searchContainer: {
+    backgroundColor: '#ffffff1A',
+    borderRadius: 10,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 15,
+    color: '#fff',
+    paddingRight: 6,
+  },
+});
