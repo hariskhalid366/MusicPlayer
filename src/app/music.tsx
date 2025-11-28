@@ -24,7 +24,8 @@ import { MusicFile } from '../constants/type';
 import Swipable from '../components/Swipable';
 import { checkAndRequestStoragePermission } from '../constants/Permission';
 import FastImage from 'react-native-fast-image';
-import { InteractionManager } from 'react-native';
+import AddSongModal from '../components/modal/AddToPlaylistModal';
+import { FlatList } from 'react-native-gesture-handler';
 
 const { MusicFiles } = NativeModules;
 
@@ -40,6 +41,9 @@ const Main = () => {
   const id = 'songs';
   const { loadAudios, audios, isLoading, searchAudios } = useAudioStore();
 
+  const [isVisible, setIsVisible] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<MusicFile | null>(null);
+
   const fetchMusicList = useCallback(
     async (forceRefresh = false) => {
       try {
@@ -49,9 +53,7 @@ const Main = () => {
         if (!forceRefresh && audios.length > 0) {
           return;
         }
-
         setLoading(true);
-
         const files = await MusicFiles.getAllAudioFiles();
         if (!files?.length) {
           showToast('No music files found');
@@ -60,32 +62,24 @@ const Main = () => {
 
         await TrackPlayer.reset();
 
-        // avoid blocking UI with TrackPlayer.add for large lists — do it after interactions
-        InteractionManager.runAfterInteractions(async () => {
-          try {
-            await TrackPlayer.add(files);
-          } catch (err) {
-            console.warn('TrackPlayer.add failed:', err);
-          }
-        });
+        try {
+          await TrackPlayer.add(files);
+        } catch (err) {
+          console.warn('TrackPlayer.add failed:', err);
+        }
 
-        // update app state first so we can render quickly; TrackPlayer queue is populated shortly after
         loadAudios(files);
+        try {
+          const covers = files
+            .map((f: any) => f?.cover)
+            .filter(Boolean)
+            .slice(0, 50)
+            .map((uri: string) => ({ uri }));
 
-        // warm image cache for album covers to reduce jank while scrolling
-        InteractionManager.runAfterInteractions(() => {
-          try {
-            const covers = files
-              .map((f: any) => f?.cover)
-              .filter(Boolean)
-              .slice(0, 50) // preload a small subset to avoid memory blow-up
-              .map((uri: string) => ({ uri }));
-
-            if (covers.length) FastImage.preload(covers);
-          } catch (err) {
-            console.warn('FastImage preload failed:', err);
-          }
-        });
+          if (covers.length) FastImage.preload(covers);
+        } catch (err) {
+          console.warn('FastImage preload failed:', err);
+        }
       } catch (error) {
         console.log('Error fetching music:', error);
       } finally {
@@ -103,7 +97,6 @@ const Main = () => {
 
   const onHandleTrackPlayerSong = useCallback(
     async (item: MusicFile) => {
-      // handleTrackPlayerSong is an imported util — keep parent stable
       handleTrackPlayerSong(item, audios, id, setLoading);
     },
     [audios, id],
@@ -111,7 +104,12 @@ const Main = () => {
 
   const renderItem = useCallback(
     ({ item, index }: any) => (
-      <Swipable>
+      <Swipable
+        item={item}
+        index={index}
+        setIsVisible={setIsVisible}
+        setCurrentTrack={setCurrentTrack}
+      >
         <ListView
           isActive={activeTrack?.url === item?.url}
           isPlaying={playing}
@@ -121,7 +119,6 @@ const Main = () => {
         />
       </Swipable>
     ),
-    // keep dependencies minimal so renderItem identity is stable
     [onHandleTrackPlayerSong, playing, activeTrack?.url, audios],
   );
 
@@ -136,15 +133,10 @@ const Main = () => {
   );
 
   useEffect(() => {
-    // clear previous timer
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
-
-    // debounce to 200ms — reduces re-filtering while typing
-    // @ts-ignore
     debounceRef.current = setTimeout(() => setDebouncedSearch(search), 200);
-
     return () => {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
@@ -172,16 +164,21 @@ const Main = () => {
         data={sList.length > 0 ? sList : audios}
         renderItem={renderItem}
         keyExtractor={(item: MusicFile) => item.url}
-        estimatedItemSize={82}
         maintainVisibleContentPosition={{
-          autoscrollToTopThreshold: 10,
+          minIndexForVisible: 0,
+          autoscrollToTopThreshold: 50,
         }}
-        decelerationRate={0.6}
-        scrollEventThrottle={16}
+        maxToRenderPerBatch={30}
+        renderToHardwareTextureAndroid={true}
         refreshing={refreshing}
         onRefresh={onRefresh}
+        windowSize={50}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={EmptyComponent}
+        showsVerticalScrollIndicator={false}
+      />
+      <AddSongModal
+        {...{ isVisible, setCurrentTrack, setIsVisible, currentTrack }}
       />
     </View>
   );

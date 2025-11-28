@@ -1,4 +1,4 @@
-import { FlatList, Text, ToastAndroid, View } from 'react-native';
+import { Text, ToastAndroid, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 const AnyFlashList: any = FlashList as unknown as any;
 import React, { useState } from 'react';
@@ -62,10 +62,8 @@ const Playlist = () => {
 
   return (
     <>
-      <FlatList
+      <AnyFlashList
         stickyHeaderIndices={[0]}
-        decelerationRate={0.6}
-        scrollEventThrottle={16}
         contentContainerStyle={{
           paddingHorizontal: 10,
           paddingBottom: 150,
@@ -79,13 +77,8 @@ const Playlist = () => {
           index: number;
         }) => <PlayLIstItemView {...{ index, item, deletePlaylist }} />}
         keyExtractor={(item: any) => item.id}
-        // estimatedItemSize={132}
+        estimatedItemSize={132}
         removeClippedSubviews={true}
-        getItemLayout={(_data: any, index: number) => ({
-          length: 132,
-          offset: 132 * index,
-          index,
-        })}
         ListHeaderComponent={
           <Header
             title="Playlist"

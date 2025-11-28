@@ -103,15 +103,23 @@ export const RepeatButton = ({ size, color }: IconProps) => {
 };
 
 const PlayPause = ({ size, color }: IconProps) => {
-  const isPlaying = useIsPlaying();
+  const { playing } = useIsPlaying();
+  const [optimisticPlaying, setOptimisticPlaying] = useState(playing);
+
+  useEffect(() => {
+    setOptimisticPlaying(playing);
+  }, [playing]);
+
   const togglePlayPause = () => {
-    isPlaying.playing ? TrackPlayer.pause() : TrackPlayer.play();
+    const newValue = !optimisticPlaying;
+    setOptimisticPlaying(newValue);
+    newValue ? TrackPlayer.play() : TrackPlayer.pause();
   };
 
   return (
     <ControlButton
       onPress={togglePlayPause}
-      IconComponent={isPlaying.playing ? Icon.PauseIcon : Icon.PlayIcon}
+      IconComponent={optimisticPlaying ? Icon.PauseIcon : Icon.PlayIcon}
       size={size}
       color={color}
     />

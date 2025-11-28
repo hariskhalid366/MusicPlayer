@@ -26,6 +26,7 @@ const HeaderSearchBar = ({ search, setSearch, title }: ContainerProps) => {
 
       <View style={styles.searchContainer}>
         <TextInput
+          autoFocus={false}
           value={search}
           onChangeText={setSearch}
           placeholder="Search"

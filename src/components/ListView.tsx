@@ -13,6 +13,7 @@ import { ListItemProps } from '../constants/type';
 import { useAudioStore } from '../store/useAudioStore';
 
 import TrackPlayer from 'react-native-track-player';
+import PlayStateIcons from './PlayStateIcons';
 
 const ListViewComponent = ({
   item,
@@ -49,17 +50,7 @@ const ListViewComponent = ({
         resizeMode={FastImage.resizeMode.cover}
       />
 
-      <View style={styles.icon}>
-        {isActive ? (
-          isPlaying ? (
-            <Icon.PauseIcon size={23} color="#fff" />
-          ) : (
-            <Icon.PlayIcon size={23} color="#fff" />
-          )
-        ) : (
-          <Icon.AudioLines size={23} color="#fff" />
-        )}
-      </View>
+      <PlayStateIcons isActive={isActive} />
 
       <View style={styles.infoContainer}>
         <Text style={styles.title} numberOfLines={2}>
@@ -127,16 +118,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 15,
   },
-  icon: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    marginHorizontal: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#ffffff22',
-    borderRadius: 12,
-  },
+
   infoContainer: {
     flex: 1,
     paddingLeft: 12,

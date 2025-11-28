@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { mmkvStorage } from './storage';
 import { MusicFile } from '../constants/type';
-import { Alert, LayoutAnimation, InteractionManager } from 'react-native';
+import { Alert, LayoutAnimation } from 'react-native';
 import RNFS from 'react-native-fs';
 import TrackPlayer from 'react-native-track-player';
 
@@ -81,11 +81,10 @@ export const useAudioStore = create<MusicStore>()(
               try {
                 set({ isLoading: true });
                 const isExist = await RNFS.exists(item.url);
+                console.log('isExists', isExist);
 
                 if (isExist) {
-                  await RNFS.unlink(item.url).then(data => {
-                    console.log(data);
-                  });
+                  await RNFS.unlink(item.url);
                 }
                 set(state => ({
                   audios: state.audios.filter(a => a.url !== item.url),
@@ -97,6 +96,7 @@ export const useAudioStore = create<MusicStore>()(
                 );
 
                 await TrackPlayer.add(get().audios);
+                return true;
               } catch (err) {
                 console.log('Delete failed:', err);
               } finally {
@@ -114,7 +114,6 @@ export const useAudioStore = create<MusicStore>()(
       name: 'audio-storage',
       partialize: state => ({
         favourite: state.favourite,
-        audios: state.audios,
       }),
       storage: createJSONStorage(() => mmkvStorage),
     },

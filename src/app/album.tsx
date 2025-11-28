@@ -1,5 +1,4 @@
 import {
-  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -8,7 +7,7 @@ import {
 import { FlashList } from '@shopify/flash-list';
 const AnyFlashList: any = FlashList as unknown as any;
 import FastImage from 'react-native-fast-image';
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Icon from 'lucide-react-native';
 import Header from '../components/Header';
 import { MusicFile } from '../constants/type';
@@ -41,7 +40,7 @@ const Album = ({ navigation }: any) => {
   }, [audios]);
 
   return (
-    <FlatList
+    <AnyFlashList
       data={Object.entries(artist ?? {})}
       keyExtractor={(item: [string, any]) => item[0]}
       showsVerticalScrollIndicator={false}
@@ -87,7 +86,7 @@ const Album = ({ navigation }: any) => {
           </TouchableOpacity>
         );
       }}
-      // estimatedItemSize={90}
+      estimatedItemSize={90}
     />
   );
 };
