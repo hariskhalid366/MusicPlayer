@@ -68,5 +68,5 @@ It features background playback, queue management, liked songs, artists view, pl
 
 Clone the repository:
 ```bash
-git clone https://github.com/yourusername/react-native-music-player.git
+git clone https://github.com/hariskhalid366/react-native-music-player.git
 cd react-native-music-player
