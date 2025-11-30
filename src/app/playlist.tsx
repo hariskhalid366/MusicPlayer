@@ -1,6 +1,5 @@
 import { Text, ToastAndroid, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-const AnyFlashList: any = FlashList as unknown as any;
 import React, { useState } from 'react';
 import { useMMKVObject } from 'react-native-mmkv';
 import { Storage } from '../store/storage';
@@ -62,7 +61,7 @@ const Playlist = () => {
 
   return (
     <>
-      <AnyFlashList
+      <FlashList
         stickyHeaderIndices={[0]}
         contentContainerStyle={{
           paddingHorizontal: 10,
@@ -77,7 +76,6 @@ const Playlist = () => {
           index: number;
         }) => <PlayLIstItemView {...{ index, item, deletePlaylist }} />}
         keyExtractor={(item: any) => item.id}
-        estimatedItemSize={132}
         removeClippedSubviews={true}
         ListHeaderComponent={
           <Header
@@ -94,7 +92,7 @@ const Playlist = () => {
               alignItems: 'center',
             }}
           >
-            <Text style={{ color: '#fff' }}>Hello</Text>
+            <Text style={{ color: '#fff' }}>No data found</Text>
           </View>
         }
       />

@@ -11,6 +11,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { MusicFile } from '../constants/type';
+import { useMappingHelper } from '@shopify/flash-list';
 
 interface ItemProps {
   item: {
@@ -51,11 +52,13 @@ const PlayLIstItemView = ({ item, index, deletePlaylist }: ItemProps) => {
     }
   };
 
+  const { getMappingKey } = useMappingHelper();
+
   return (
     <>
       <TouchableOpacity
         onPress={() => nav.navigate('PlaylistSongs', { item })}
-        key={index}
+        key={getMappingKey(item?.id, index)}
         activeOpacity={0.8}
         style={styles.container}
       >

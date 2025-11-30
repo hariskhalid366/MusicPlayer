@@ -6,9 +6,8 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import { View, Text, RefreshControl, StyleSheet } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
-const AnyFlashList: any = FlashList as unknown as any;
+import { View, Text,  StyleSheet } from 'react-native';
+import { FlashList} from '@shopify/flash-list';
 import TrackPlayer, {
   useActiveTrack,
   useIsPlaying,
@@ -160,22 +159,24 @@ const Main = () => {
         track={audios}
       />
 
-      <AnyFlashList
+      <FlashList
         data={sList.length > 0 ? sList : audios}
         renderItem={renderItem}
         keyExtractor={(item: MusicFile) => item.url}
         maintainVisibleContentPosition={{
-          minIndexForVisible: 0,
           autoscrollToTopThreshold: 50,
         }}
-        maxToRenderPerBatch={30}
         renderToHardwareTextureAndroid={true}
         refreshing={refreshing}
         onRefresh={onRefresh}
-        windowSize={50}
+        // minIndexForVisible: 0,
+        // maxToRenderPerBatch={30}
+        // windowSize={15}
+        // estimatedItemSize={82}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={EmptyComponent}
         showsVerticalScrollIndicator={false}
+        optimizeItemArrangement={true}
       />
       <AddSongModal
         {...{ isVisible, setCurrentTrack, setIsVisible, currentTrack }}

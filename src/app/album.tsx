@@ -4,8 +4,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
-const AnyFlashList: any = FlashList as unknown as any;
+import { FlashList, useMappingHelper } from '@shopify/flash-list';
 import FastImage from 'react-native-fast-image';
 import React, { useEffect, useState } from 'react';
 import * as Icon from 'lucide-react-native';
@@ -17,6 +16,7 @@ const Album = ({ navigation }: any) => {
   const [artist, setArtist] = useState<Record<string, MusicFile[]>>();
 
   const { audios } = useAudioStore();
+  const { getMappingKey } = useMappingHelper();
 
   useEffect(() => {
     if (Array.isArray(audios)) {
@@ -40,7 +40,7 @@ const Album = ({ navigation }: any) => {
   }, [audios]);
 
   return (
-    <AnyFlashList
+    <FlashList
       data={Object.entries(artist ?? {})}
       keyExtractor={(item: [string, any]) => item[0]}
       showsVerticalScrollIndicator={false}
@@ -57,7 +57,7 @@ const Album = ({ navigation }: any) => {
 
         return (
           <TouchableOpacity
-            key={index}
+            key={getMappingKey(item?.duration, index)}
             onPress={() =>
               navigation.navigate('ArtistSongs', {
                 songs,
@@ -86,7 +86,6 @@ const Album = ({ navigation }: any) => {
           </TouchableOpacity>
         );
       }}
-      estimatedItemSize={90}
     />
   );
 };

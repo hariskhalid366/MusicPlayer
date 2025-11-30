@@ -1,6 +1,5 @@
 import { Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-const AnyFlashList: any = FlashList as unknown as any;
 import React, { memo, useCallback, useMemo } from 'react';
 import ListView from './ListView';
 import { handleTrackPlayerSong } from '../utility/handleTrackChange';
@@ -55,7 +54,7 @@ const FlatlistComponent = ({
   );
 
   return (
-    <AnyFlashList
+    <FlashList
       data={combinedData}
       keyExtractor={(item: any, index: number) =>
         item?.url ? item.url : `header-${index}`
@@ -79,24 +78,23 @@ const FlatlistComponent = ({
       maintainVisibleContentPosition={{
         autoscrollToTopThreshold: 10,
       }}
-      estimatedItemSize={ITEM_HEIGHT}
       removeClippedSubviews={true}
-      getItemLayout={(data: any, index: number) => {
-        const isHeader = data && data[0] && data[0].header && index === 0;
-        if (isHeader) {
-          return {
-            length: HEADER_HEIGHT,
-            offset: HEADER_HEIGHT * index,
-            index,
-          };
-        }
-        const headerOffset =
-          data && data[0] && data[0].header ? HEADER_HEIGHT : 0;
-        const offset =
-          headerOffset +
-          ITEM_HEIGHT * (data && data[0] && data[0].header ? index - 1 : index);
-        return { length: ITEM_HEIGHT, offset, index };
-      }}
+      // getItemLayout={(data: any, index: number) => {
+      //   const isHeader = data && data[0] && data[0].header && index === 0;
+      //   if (isHeader) {
+      //     return {
+      //       length: HEADER_HEIGHT,
+      //       offset: HEADER_HEIGHT * index,
+      //       index,
+      //     };
+      //   }
+      //   const headerOffset =
+      //     data && data[0] && data[0].header ? HEADER_HEIGHT : 0;
+      //   const offset =
+      //     headerOffset +
+      //     ITEM_HEIGHT * (data && data[0] && data[0].header ? index - 1 : index);
+      //   return { length: ITEM_HEIGHT, offset, index };
+      // }}
       decelerationRate={0.6}
       scrollEventThrottle={16}
       contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 150 }}
