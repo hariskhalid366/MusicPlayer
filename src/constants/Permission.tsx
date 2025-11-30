@@ -3,31 +3,42 @@ import showToast from '../components/Toast';
 
 export const checkAndRequestStoragePermission = async () => {
   if (Platform.OS !== 'android') {
-    return;
+    return true;
   }
   try {
-    const readPermission = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
-
-    const writePermission =
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
-
-    const result = await PermissionsAndroid.requestMultiple([
-      readPermission,
-      writePermission,
-    ]);
-
-    const readGranted =
-      result[readPermission] === PermissionsAndroid.RESULTS.GRANTED;
-    const writeGranted =
-      result[writePermission] === PermissionsAndroid.RESULTS.GRANTED;
-
-    if (readGranted && writeGranted) {
-      // showToast('Storage permissions granted');
-      return true;
+    if (Number(Platform.Version) >= 33) {
+      const permission = PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO;
+      const result = await PermissionsAndroid.request(permission);
+      if (result === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      } else {
+        showToast('Permission denied');
+        Linking.openSettings();
+        return false;
+      }
     } else {
-      showToast('Storage permission denied');
-      Linking.openSettings();
-      return false;
+      const readPermission =
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+      const writePermission =
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+
+      const result = await PermissionsAndroid.requestMultiple([
+        readPermission,
+        writePermission,
+      ]);
+
+      const readGranted =
+        result[readPermission] === PermissionsAndroid.RESULTS.GRANTED;
+      const writeGranted =
+        result[writePermission] === PermissionsAndroid.RESULTS.GRANTED;
+
+      if (readGranted && writeGranted) {
+        return true;
+      } else {
+        showToast('Storage permission denied');
+        Linking.openSettings();
+        return false;
+      }
     }
   } catch (err) {
     console.warn('Permission Error:', err);

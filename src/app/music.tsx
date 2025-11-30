@@ -6,8 +6,8 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import { View, Text,  StyleSheet } from 'react-native';
-import { FlashList} from '@shopify/flash-list';
+import { View, Text, StyleSheet } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import TrackPlayer, {
   useActiveTrack,
   useIsPlaying,
@@ -42,6 +42,9 @@ const Main = () => {
 
   const [isVisible, setIsVisible] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<MusicFile | null>(null);
+  useEffect(() => {
+    fetchMusicList();
+  }, []);
 
   const fetchMusicList = useCallback(
     async (forceRefresh = false) => {
@@ -177,6 +180,7 @@ const Main = () => {
         ListEmptyComponent={EmptyComponent}
         showsVerticalScrollIndicator={false}
         optimizeItemArrangement={true}
+        decelerationRate={0.2}
       />
       <AddSongModal
         {...{ isVisible, setCurrentTrack, setIsVisible, currentTrack }}

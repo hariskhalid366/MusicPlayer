@@ -46,7 +46,7 @@ const Swipable = ({
           }
         });
       } else if (translateX.value > SWIPE_RIGHT_THRESHOLD) {
-        translateX.value = withTiming(150, { duration: 200 }, fin => {
+        translateX.value = withTiming(0, { duration: 200 }, fin => {
           if (fin) {
             scheduleOnRN(handleRightSwipe);
           }

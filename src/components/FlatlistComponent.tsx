@@ -13,9 +13,6 @@ interface FlatlistItemProps {
   ListHeaderComponent?: React.ReactElement | null; // Optional header component
 }
 
-const ITEM_HEIGHT = 82; // fixed row height to make getItemLayout possible
-const HEADER_HEIGHT = 56; // approximate header height when provided
-
 const FlatlistComponent = ({
   id,
   items,
@@ -95,7 +92,7 @@ const FlatlistComponent = ({
       //     ITEM_HEIGHT * (data && data[0] && data[0].header ? index - 1 : index);
       //   return { length: ITEM_HEIGHT, offset, index };
       // }}
-      decelerationRate={0.6}
+      decelerationRate={0.2}
       scrollEventThrottle={16}
       contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 150 }}
     />

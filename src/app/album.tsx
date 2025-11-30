@@ -1,9 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FlashList, useMappingHelper } from '@shopify/flash-list';
 import FastImage from 'react-native-fast-image';
 import React, { useEffect, useState } from 'react';
@@ -48,7 +43,6 @@ const Album = ({ navigation }: any) => {
         paddingVertical: 10,
         paddingBottom: 100,
       }}
-      stickyHeaderIndices={[0]}
       ListHeaderComponent={<Header title="Artists" />}
       renderItem={({ item, index }: any) => {
         const [artistKey, songs] = item;
