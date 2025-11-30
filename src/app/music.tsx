@@ -1,9 +1,9 @@
 import React, {
   memo,
   useCallback,
+  useEffect,
   useMemo,
   useState,
-  useEffect,
   useRef,
 } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
@@ -24,7 +24,6 @@ import Swipable from '../components/Swipable';
 import { checkAndRequestStoragePermission } from '../constants/Permission';
 import FastImage from 'react-native-fast-image';
 import AddSongModal from '../components/modal/AddToPlaylistModal';
-import { FlatList } from 'react-native-gesture-handler';
 
 const { MusicFiles } = NativeModules;
 
@@ -34,6 +33,7 @@ const Main = () => {
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const debounceRef = useRef<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
   const activeTrack = useActiveTrack();
   const { playing } = useIsPlaying();
 
@@ -42,6 +42,8 @@ const Main = () => {
 
   const [isVisible, setIsVisible] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<MusicFile | null>(null);
+
+  // Fetch music files
   useEffect(() => {
     fetchMusicList();
   }, []);
@@ -52,38 +54,31 @@ const Main = () => {
         const permission = await checkAndRequestStoragePermission();
         if (!permission) return;
 
-        if (!forceRefresh && audios.length > 0) {
-          return;
-        }
+        if (!forceRefresh && audios.length > 0) return;
+
         setLoading(true);
         const files = await MusicFiles.getAllAudioFiles();
+
         if (!files?.length) {
           showToast('No music files found');
           return;
         }
 
         await TrackPlayer.reset();
-
-        try {
-          await TrackPlayer.add(files);
-        } catch (err) {
-          console.warn('TrackPlayer.add failed:', err);
-        }
+        await TrackPlayer.add(files);
 
         loadAudios(files);
-        try {
-          const covers = files
-            .map((f: any) => f?.cover)
-            .filter(Boolean)
-            .slice(0, 50)
-            .map((uri: string) => ({ uri }));
 
-          if (covers.length) FastImage.preload(covers);
-        } catch (err) {
-          console.warn('FastImage preload failed:', err);
-        }
+        // Preload covers for smooth scrolling
+        const covers = files
+          .map((f: any) => f?.cover)
+          .filter(Boolean)
+          .slice(0, 50)
+          .map((uri: string) => ({ uri }));
+
+        if (covers.length) FastImage.preload(covers);
       } catch (error) {
-        console.log('Error fetching music:', error);
+        console.warn('Error fetching music:', error);
       } finally {
         setRefreshing(false);
         setLoading(false);
@@ -92,10 +87,30 @@ const Main = () => {
     [audios.length, loadAudios],
   );
 
-  const onRefresh = async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchMusicList(true);
-  };
+  }, [fetchMusicList]);
+
+  // Debounce search input
+  useEffect(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
+    debounceRef.current = setTimeout(() => setDebouncedSearch(search), 200);
+    return () => {
+      if (debounceRef.current !== null) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = null;
+      }
+    };
+  }, [search]);
+
+  const filteredList = useMemo(
+    () => (debouncedSearch ? searchAudios(debouncedSearch) : audios),
+    [audios, debouncedSearch, searchAudios],
+  );
 
   const onHandleTrackPlayerSong = useCallback(
     async (item: MusicFile) => {
@@ -104,8 +119,9 @@ const Main = () => {
     [audios, id],
   );
 
+  // Render each item, memoized for performance
   const renderItem = useCallback(
-    ({ item, index }: any) => (
+    ({ item, index }: { item: MusicFile; index: number }) => (
       <Swipable
         item={item}
         index={index}
@@ -113,42 +129,25 @@ const Main = () => {
         setCurrentTrack={setCurrentTrack}
       >
         <ListView
-          isActive={activeTrack?.url === item?.url}
-          isPlaying={playing}
           item={item}
           index={index}
+          isActive={activeTrack?.url === item.url}
+          isPlaying={playing}
           handleTrack={onHandleTrackPlayerSong}
         />
       </Swipable>
     ),
-    [onHandleTrackPlayerSong, playing, activeTrack?.url, audios],
+    [activeTrack?.url, playing, onHandleTrackPlayerSong],
   );
 
   const EmptyComponent = useMemo(
     () =>
-      !audios.length && !loading ? (
+      !filteredList.length && !loading ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No songs found</Text>
         </View>
       ) : null,
-    [audios.length, loading],
-  );
-
-  useEffect(() => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-    debounceRef.current = setTimeout(() => setDebouncedSearch(search), 200);
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, [search]);
-
-  const sList = useMemo(
-    () => searchAudios(debouncedSearch),
-    [searchAudios, debouncedSearch],
+    [filteredList.length, loading],
   );
 
   return (
@@ -163,27 +162,22 @@ const Main = () => {
       />
 
       <FlashList
-        data={sList.length > 0 ? sList : audios}
+        data={filteredList}
         renderItem={renderItem}
-        keyExtractor={(item: MusicFile) => item.url}
-        maintainVisibleContentPosition={{
-          autoscrollToTopThreshold: 50,
-        }}
-        renderToHardwareTextureAndroid={true}
+        keyExtractor={item => item.url}
         refreshing={refreshing}
         onRefresh={onRefresh}
-        // minIndexForVisible: 0,
-        // maxToRenderPerBatch={30}
-        // windowSize={15}
-        // estimatedItemSize={82}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={EmptyComponent}
-        showsVerticalScrollIndicator={false}
-        optimizeItemArrangement={true}
-        decelerationRate={0.2}
+        maintainVisibleContentPosition={{ autoscrollToTopThreshold: 50 }}
       />
+
       <AddSongModal
-        {...{ isVisible, setCurrentTrack, setIsVisible, currentTrack }}
+        isVisible={isVisible}
+        setIsVisible={setIsVisible}
+        currentTrack={currentTrack}
+        setCurrentTrack={setCurrentTrack}
       />
     </View>
   );
@@ -193,7 +187,7 @@ export default memo(Main);
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
+  listContent: { paddingBottom: 100 },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyText: { color: '#fff', fontSize: 16, marginTop: 20 },
-  listContent: { paddingBottom: 100 },
 });

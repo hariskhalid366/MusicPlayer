@@ -75,7 +75,6 @@ const AddSongModal: FC<AddSongModalProps> = ({
   return (
     <Modal
       transparent
-      statusBarTranslucent
       animationType="slide"
       onRequestClose={onClose}
       visible={isVisible}
@@ -145,8 +144,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#000',
     width: '100%',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
   },
   touchable: {
     alignSelf: 'flex-end',
