@@ -170,6 +170,9 @@ const Main = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={EmptyComponent}
+        removeClippedSubviews={true}
+        decelerationRate={0.2}
+        scrollEventThrottle={16}
         maintainVisibleContentPosition={{ autoscrollToTopThreshold: 50 }}
       />
 
