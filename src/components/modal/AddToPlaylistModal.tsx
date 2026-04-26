@@ -6,15 +6,13 @@ import {
   ScrollView,
   StyleSheet,
   ToastAndroid,
+  Image,
 } from 'react-native';
-import React, { FC } from 'react';
-import FastImage from 'react-native-fast-image';
+import React, { FC, memo, useCallback } from 'react';
 import * as Icon from 'lucide-react-native';
-import { useMMKVObject } from 'react-native-mmkv';
-import { Storage } from '../../store/storage';
-import { PlaylistProps } from '../../app/playlist';
 import { MusicFile } from '../../constants/type';
 import Header from '../Header';
+import { useAudioStore } from '../../store/useAudioStore';
 
 interface AddSongModalProps {
   isVisible: boolean;
@@ -29,43 +27,23 @@ const AddSongModal: FC<AddSongModalProps> = ({
   setCurrentTrack,
   currentTrack,
 }) => {
-  const [playlistSongs, setPlaylistSongs] =
-    useMMKVObject<PlaylistProps[]>('playlist', Storage) || [];
+  const playlists = useAudioStore(state => state.playlists);
+  const addtoPlaylist = useAudioStore(state => state.addtoPlaylist);
 
-  const validPlaylistSongs = playlistSongs || [];
-
-  const addSongToPlaylist = (playlistId: string, song: MusicFile) => {
-    const updatedPlaylists = playlistSongs?.map(playlist => {
-      if (playlist.id === playlistId) {
-        const songExists = playlist.songs.some(
-          existingSong => existingSong.url === song.url,
-        );
-
-        if (songExists) {
-          ToastAndroid.showWithGravity(
-            'Song already exists in the playlist',
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
-          return playlist;
-        }
-
-        return {
-          ...playlist,
-          songs: [...playlist.songs, song],
-        };
-      }
-
-      return playlist;
-    });
-
-    setPlaylistSongs(updatedPlaylists);
-    ToastAndroid.showWithGravity(
-      'Song added to playlist',
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER,
-    );
-  };
+  const onAddSong = useCallback(
+    (playlistId: string) => {
+      if (!currentTrack) return;
+      addtoPlaylist(playlistId, currentTrack);
+      setIsVisible(false);
+      setCurrentTrack(null);
+      ToastAndroid.showWithGravity(
+        'Song added to playlist',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    },
+    [currentTrack, addtoPlaylist, setIsVisible, setCurrentTrack],
+  );
 
   const onClose = () => {
     setIsVisible(false);
@@ -93,22 +71,17 @@ const AddSongModal: FC<AddSongModalProps> = ({
             }}
           >
             <Header title="Add to Playlist" />
-            {validPlaylistSongs.map((item, index) => (
+            {playlists.map((item, index) => (
               <TouchableOpacity
-                onPress={() => {
-                  if (currentTrack) {
-                    addSongToPlaylist(item.id, currentTrack);
-                  }
-                  setIsVisible(false);
-                }}
-                key={index}
+                onPress={() => onAddSong(item.id)}
+              key={item.id}
                 activeOpacity={0.8}
                 style={styles.container}
               >
-                <FastImage
+                <Image
                   style={styles.image}
                   source={require('../../../assets/playlist.jpeg')}
-                  resizeMode={FastImage.resizeMode.cover}
+                  resizeMode="cover"
                 />
                 <View style={styles.infoContainer}>
                   <Text
@@ -131,7 +104,7 @@ const AddSongModal: FC<AddSongModalProps> = ({
   );
 };
 
-export default AddSongModal;
+export default memo(AddSongModal);
 
 const styles = StyleSheet.create({
   outerContainer: {

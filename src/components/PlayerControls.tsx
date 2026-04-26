@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect } from 'react'; // Added useState, useEffect
+import React, { memo, useCallback, useState } from 'react';
 import {
   StyleProp,
   TouchableOpacity,
@@ -24,7 +24,7 @@ interface SliderStyleProps {
 
 const styles = StyleSheet.create({
   touchable: {
-    padding: 8,
+    padding: 10,
     backgroundColor: '#ffffff33',
     margin: 4,
     borderRadius: 50,
@@ -37,98 +37,103 @@ const ControlButton = memo(({ onPress, IconComponent, size, color }: any) => (
   </TouchableOpacity>
 ));
 
-export const Forward = ({ size, color }: IconProps) => (
+export const Forward = memo(({ size, color }: IconProps) => (
   <ControlButton
     onPress={async () => {
-      await TrackPlayer.skipToNext().then(async () => await TrackPlayer.play());
+      await TrackPlayer.skipToNext();
+      await TrackPlayer.play();
     }}
     IconComponent={Icon.StepForward}
     size={size}
     color={color}
   />
-);
+));
 
-export const Backward = ({ size, color }: IconProps) => (
+export const Backward = memo(({ size, color }: IconProps) => (
   <ControlButton
     onPress={async () => {
-      await TrackPlayer.skipToPrevious().then(
-        async () => await TrackPlayer.play(),
-      );
+      await TrackPlayer.skipToPrevious();
+      await TrackPlayer.play();
     }}
     IconComponent={Icon.StepBack}
     size={size}
     color={color}
   />
-);
+));
 
-export const RepeatButton = ({ size, color }: IconProps) => {
+export const RepeatButton = memo(({ size, color }: IconProps) => {
   const [repeatMode, setRepeatMode] = useState<RepeatMode>(RepeatMode.Off);
 
-  useEffect(() => {
+  // Fetch initial mode once on mount
+  React.useEffect(() => {
     TrackPlayer.getRepeatMode().then(setRepeatMode);
   }, []);
 
-  const toggleRepeatMode = () => {
-    let newMode: RepeatMode;
-    if (repeatMode === RepeatMode.Off) {
-      newMode = RepeatMode.Track;
-    } else if (repeatMode === RepeatMode.Track) {
-      newMode = RepeatMode.Queue;
-    } else {
-      newMode = RepeatMode.Off;
-    }
-    TrackPlayer.setRepeatMode(newMode);
-    setRepeatMode(newMode);
-  };
+  const toggleRepeatMode = useCallback(() => {
+    setRepeatMode(prev => {
+      const newMode =
+        prev === RepeatMode.Off
+          ? RepeatMode.Track
+          : prev === RepeatMode.Track
+          ? RepeatMode.Queue
+          : RepeatMode.Off;
+      TrackPlayer.setRepeatMode(newMode);
+      return newMode;
+    });
+  }, []);
 
-  const getRepeatIcon = () => {
-    switch (repeatMode) {
-      case RepeatMode.Track:
-        return Icon.Repeat1;
-      case RepeatMode.Queue:
-        return Icon.Repeat;
-      default:
-        return Icon.Repeat;
-    }
-  };
+  // Compute once — stable reference per render avoids ControlButton memo invalidation
+  const RepeatIcon =
+    repeatMode === RepeatMode.Track ? Icon.Repeat1 : Icon.Repeat;
 
   return (
     <ControlButton
-      IconComponent={getRepeatIcon()}
+      IconComponent={RepeatIcon}
       onPress={toggleRepeatMode}
       color={repeatMode === RepeatMode.Off ? '#ffffff99' : '#fff'}
       size={size}
     />
   );
-};
+});
 
-const PlayPause = ({ size, color }: IconProps) => {
+export const PlayPause = memo(({ size, color }: IconProps) => {
   const { playing } = useIsPlaying();
-  const [optimisticPlaying, setOptimisticPlaying] = useState(playing);
+  const [optimistic, setOptimistic] = useState<boolean | undefined>(undefined);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    setOptimisticPlaying(playing);
-  }, [playing]);
+  // Clear any pending timer on unmount to avoid setState on dead component
+  React.useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
-  const togglePlayPause = () => {
-    const newValue = !optimisticPlaying;
-    setOptimisticPlaying(newValue);
-    newValue ? TrackPlayer.play() : TrackPlayer.pause();
-  };
+  const displayPlaying = optimistic ?? playing;
+
+  const togglePlayPause = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    const next = !displayPlaying;
+    setOptimistic(next);
+    timerRef.current = setTimeout(() => {
+      setOptimistic(undefined);
+      timerRef.current = null;
+    }, 300);
+    next ? TrackPlayer.play() : TrackPlayer.pause();
+  }, [displayPlaying]);
 
   return (
     <ControlButton
       onPress={togglePlayPause}
-      IconComponent={optimisticPlaying ? Icon.PauseIcon : Icon.PlayIcon}
+      IconComponent={displayPlaying ? Icon.PauseIcon : Icon.PlayIcon}
       size={size}
       color={color}
     />
   );
-};
+});
 
 export default PlayPause;
 
-export const MusicSlider = ({ style }: SliderStyleProps) => {
+export const MusicSlider = memo(({ style }: SliderStyleProps) => {
   const { position, duration } = useProgress();
 
   return (
@@ -137,10 +142,10 @@ export const MusicSlider = ({ style }: SliderStyleProps) => {
       thumbTintColor={'transparent'}
       style={style}
       minimumValue={0}
-      maximumValue={duration}
+      maximumValue={duration || 1}
       minimumTrackTintColor="#FFFFFF"
       maximumTrackTintColor="#ffffff99"
       onSlidingComplete={TrackPlayer.seekTo}
     />
   );
-};
+});

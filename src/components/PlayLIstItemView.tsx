@@ -1,5 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { memo } from 'react';
 import * as Icon from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -11,7 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { MusicFile } from '../constants/type';
-import { useMappingHelper } from '@shopify/flash-list';
+import { useAudioStore } from '../store/useAudioStore';
 
 interface ItemProps {
   item: {
@@ -19,10 +18,11 @@ interface ItemProps {
     songs: MusicFile[];
   };
   index: number;
-  deletePlaylist: (value: string) => void;
 }
 
-const PlayLIstItemView = ({ item, index, deletePlaylist }: ItemProps) => {
+const PlayLIstItemView = ({ item, index }: ItemProps) =>
+{
+  const {deletePlaylist }=useAudioStore()
   const nav: any = useNavigation();
 
   const dropDown = useSharedValue(0);
@@ -52,20 +52,18 @@ const PlayLIstItemView = ({ item, index, deletePlaylist }: ItemProps) => {
     }
   };
 
-  const { getMappingKey } = useMappingHelper();
-
   return (
     <>
       <TouchableOpacity
-        onPress={() => nav.navigate('PlaylistSongs', { item })}
-        key={getMappingKey(item?.id, index)}
+        onPress={() => nav.navigate('PlaylistSongs', { id: item.id })}
+        key={index}
         activeOpacity={0.8}
         style={styles.container}
       >
-        <FastImage
+        <Image
           style={styles.image}
           source={require('../../assets/playlist.jpeg')}
-          resizeMode={FastImage.resizeMode.cover}
+          resizeMode="cover"
         />
 
         <View style={styles.infoContainer}>

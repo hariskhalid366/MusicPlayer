@@ -1,27 +1,33 @@
 import { View } from 'react-native';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { memo, useLayoutEffect, useState } from 'react';
 
-import { PlaylistProps } from './playlist';
 import LoadingTrack from '../components/loading';
 import FlatlistComponent from '../components/FlatlistComponent';
 
+import { useAudioStore } from '../store/useAudioStore';
+
 const PlaylistSongs = ({ navigation, route }: any) => {
-  const items: PlaylistProps = route.params.item;
+  const { id } = route.params;
+  const playlist = useAudioStore(state => 
+    state.playlists.find(p => p.id === id)
+  );
+  
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: items?.id,
+      title: id,
     });
-  }, [navigation, items]);
+  }, [navigation, id]);
 
-  const id = items?.id;
   const [loading, setLoading] = useState(false);
+
+  if (!playlist) return null;
 
   return (
     <View style={{ flex: 1 }}>
       {loading && <LoadingTrack />}
-      <FlatlistComponent items={items.songs} id={id} setLoading={setLoading} />
+      <FlatlistComponent items={playlist.songs} id={id} setLoading={setLoading} />
     </View>
   );
 };
 
-export default PlaylistSongs;
+export default memo(PlaylistSongs);

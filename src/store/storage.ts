@@ -1,8 +1,8 @@
-import { MMKV, Mode } from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv';
 
-export const Storage = new MMKV({
+export const Storage = createMMKV({
   id: 'com.musicplayer.storage',
-  mode: Mode.SINGLE_PROCESS,
+  mode:"multi-process",
   encryptionKey: '{*/@#$%^&*^%$#@#$%^YN%^#nig54(!&7jRT6!@#$**&?<&*J778}:P>L::}',
 });
 
@@ -15,6 +15,6 @@ export const mmkvStorage = {
     return value ?? null;
   },
   removeItem: (key: string) => {
-    Storage.delete(key);
+    Storage.remove(key);
   },
 };

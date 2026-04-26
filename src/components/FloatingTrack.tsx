@@ -1,6 +1,5 @@
-import React, { FC, useEffect } from 'react'; // Removed useState, useEffect
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import React, { FC, useEffect, memo } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useActiveTrack } from 'react-native-track-player';
 import PlayPause, {
   Forward,
@@ -17,20 +16,28 @@ import Animated, {
   withTiming,
   withSpring,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// Created at module scope — was re-created on every render causing
+// the animation system to receive a new component class each cycle.
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 const FloatingTrack: FC<any> = ({ floatName = 'index' }) => {
   const navigation: any = useNavigation();
+  const { bottom: BOTTOM } = useSafeAreaInsets();
   const track = useActiveTrack();
 
   const bottomValue = useSharedValue(0);
   const scaleValue = useSharedValue(0);
-  const Touchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+  const bottomOffset = BOTTOM + 60;
+  const initialBottom = BOTTOM - 100;
 
   const animatedStyles = useAnimatedStyle(() => {
     const bottom = interpolate(
       bottomValue.value,
       [0, 1, 2],
-      [60, 5, -100],
+      [bottomOffset, 5, initialBottom],
       Extrapolation.CLAMP,
     );
     const scale = interpolate(
@@ -62,25 +69,26 @@ const FloatingTrack: FC<any> = ({ floatName = 'index' }) => {
       });
       scaleValue.value = withSpring(0, { duration: 200 });
     }
-  }, [floatName]);
+  }, [floatName]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!track) return null;
 
   return (
-    <Touchable
+    <AnimatedTouchable
       onPress={() => navigation.navigate('screen')}
       activeOpacity={0.8}
       style={[styles.container, animatedStyles]}
     >
       <View style={styles.innerContainer}>
-        <FastImage
+        <Animated.Image
+          sharedTransitionTag="tile"
           source={
             track?.cover
               ? { uri: track.cover }
               : require('../../assets/tile.jpeg')
           }
           style={styles.image}
-          resizeMode={FastImage.resizeMode.cover}
+          resizeMode="cover"
         />
         <View style={styles.trackInfo}>
           <Text
@@ -96,7 +104,7 @@ const FloatingTrack: FC<any> = ({ floatName = 'index' }) => {
         <PlayPause size={20} color="#fff" />
         <Forward size={20} color="#fff" />
       </View>
-    </Touchable>
+    </AnimatedTouchable>
   );
 };
 
@@ -131,14 +139,13 @@ const styles = StyleSheet.create({
   trackTitle: {
     color: '#fff',
     fontWeight: '600',
-    fontSize: 15, // Slightly smaller to fit controls
+    fontSize: 15,
   },
   slider: {
-    width: 180, // Adjusted width to make space for repeat button
-    height: 25, // Increased height slightly
+    width: 180,
+    height: 25,
     marginLeft: -12,
   },
-  // Removed controlButton, icon, iconDisabled styles as they are handled within RepeatButton
 });
 
-export default FloatingTrack;
+export default memo(FloatingTrack);

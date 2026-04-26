@@ -1,14 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import React, { memo } from 'react';
 import { useIsPlaying } from 'react-native-track-player';
 import * as Icon from 'lucide-react-native';
 
-const PlayStateIcons = ({ isActive }: any) => {
-  const { playing } = useIsPlaying();
+const PlayStateIcons = ({ isActive, isPlaying }: any) => {
   return (
     <View style={styles.icon}>
       {isActive ? (
-        playing ? (
+        isPlaying ? (
           <Icon.PauseIcon size={23} color="#fff" />
         ) : (
           <Icon.PlayIcon size={23} color="#fff" />
@@ -20,7 +19,7 @@ const PlayStateIcons = ({ isActive }: any) => {
   );
 };
 
-export default PlayStateIcons;
+export default memo(PlayStateIcons);
 
 const styles = StyleSheet.create({
   icon: {

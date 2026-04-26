@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -22,23 +22,25 @@ const Swipable = ({
   setIsVisible,
   setCurrentTrack,
 }: any) => {
-  const { deleteAudio } = useAudioStore();
+  const deleteAudio = useAudioStore(state => state.deleteAudio);
 
   const translateX = useSharedValue(0);
 
-  const onDelete = () => item && deleteAudio(item);
-  const onQueue = () => {
+  // Store callbacks in refs so the pan gesture (UI thread) always calls
+  // the latest version without requiring gesture re-creation on every render.
+  const onDelete = useCallback(() => item && deleteAudio(item), [deleteAudio, item]);
+  const onQueue = useCallback(() => {
     setCurrentTrack(item);
     setIsVisible(true);
-  };
-  const reset = () => {
-    setTimeout(() => {
-      translateX.value = withTiming(0);
-    }, 1500);
-  };
+  }, [item, setCurrentTrack, setIsVisible]);
+
+  const onDeleteRef = useRef(onDelete);
+  const onQueueRef = useRef(onQueue);
+  onDeleteRef.current = onDelete;
+  onQueueRef.current = onQueue;
 
   const pan = Gesture.Pan()
-    .activeOffsetX([-5, 5])
+    .activeOffsetX([-10, 10])
     .onUpdate(e => {
       translateX.value = e.translationX;
     })
@@ -47,16 +49,21 @@ const Swipable = ({
 
       if (endValue < SWIPE_LEFT_THRESHOLD) {
         translateX.value = withTiming(-200, { duration: 200 }, finished => {
-          if (finished) scheduleOnRN(onDelete);
+          if (finished) {
+            scheduleOnRN(onDeleteRef.current);
+            translateX.value = withTiming(0, { duration: 300 });
+          }
         });
       } else if (endValue > SWIPE_RIGHT_THRESHOLD) {
         translateX.value = withTiming(200, { duration: 200 }, fin => {
-          if (fin) scheduleOnRN(onQueue);
+          if (fin) {
+            scheduleOnRN(onQueueRef.current);
+            translateX.value = withTiming(0, { duration: 300 });
+          }
         });
       } else {
         translateX.value = withTiming(0);
       }
-      scheduleOnRN(reset);
     });
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -103,7 +110,7 @@ const Swipable = ({
 
   return (
     <GestureDetector gesture={pan}>
-      <Animated.View key={item?._id ?? index}>
+      <Animated.View key={item?.id ?? index}>
         <Animated.View style={[styles.leftIcon, queueIconStyle]}>
           <ListMusic color="#fff" size={22} />
         </Animated.View>

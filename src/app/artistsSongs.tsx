@@ -1,7 +1,6 @@
 import { View } from 'react-native';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { memo, useLayoutEffect, useState } from 'react';
 import LoadingTrack from '../components/loading';
-
 import FlatlistComponent from '../components/FlatlistComponent';
 import { MusicFile } from '../constants/type';
 
@@ -9,13 +8,11 @@ const ArtistsSongs = ({ route, navigation }: any) => {
   const name: string = route?.params?.name;
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      title: name,
-    });
+    navigation.setOptions({ title: name });
   }, [navigation, name]);
 
   const songs: MusicFile[] = route?.params?.songs;
-  const id = songs[0].artist;
+  const id = songs[0]?.artist ?? name;
   const [loading, setLoading] = useState(false);
 
   return (
@@ -26,4 +23,4 @@ const ArtistsSongs = ({ route, navigation }: any) => {
   );
 };
 
-export default ArtistsSongs;
+export default memo(ArtistsSongs);

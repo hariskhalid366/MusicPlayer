@@ -60,7 +60,7 @@ It features background playback, queue management, liked songs, artists view, pl
 - **`react-navigation`** → Smooth navigation between player and library
 - **`FlashList`** → High-performance music list rendering
 - **`react-native-bootsplash`** → Custom splash animation
-- **`heroicons`** → Beautiful, minimal icons
+- **`lucide-react-native`** → Beautiful, minimal icons
 
 ---
 

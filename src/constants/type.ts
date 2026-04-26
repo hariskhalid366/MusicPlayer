@@ -1,4 +1,5 @@
 export type MusicFile = {
+  id?: string;
   album: string;
   artist: string;
   cover: string;

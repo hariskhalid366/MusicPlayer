@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import React from 'react';
+import React, { memo } from 'react';
 import * as Outline from 'lucide-react-native';
 
 interface HeaderProps {
@@ -43,4 +43,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Header;
+export default memo(Header);

@@ -1,14 +1,45 @@
-import React from 'react';
-import Main from '../app/music';
+import React, { memo } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import * as Icon from 'lucide-react-native';
-import { ActivityIndicator, Text, View } from 'react-native';
+
+import Main from '../app/music';
 import Album from '../app/album';
 import Favourite from '../app/favourite';
 import Playlist from '../app/playlist';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+
+const Tab = createMaterialTopTabNavigator();
+
+// const LazyPlaceholder = memo(() => (
+//   <View style={styles.placeholder}>
+//     <ActivityIndicator color="#fff" size="large" />
+//   </View>
+// ));
+
+const TABS = [
+  {
+    name: 'Songs',
+    component: Main,
+    icon: Icon.Music,
+  },
+  {
+    name: 'Favourite',
+    component: Favourite,
+    icon: Icon.HeartIcon,
+  },
+  {
+    name: 'Playlist',
+    component: Playlist,
+    icon: Icon.ListMusic,
+  },
+  {
+    name: 'Artists',
+    component: Album,
+    icon: Icon.Users,
+  },
+];
 
 const BottomTabs = () => {
-  const Tab = createMaterialTopTabNavigator();
   return (
     <Tab.Navigator
       initialRouteName="Songs"
@@ -16,93 +47,67 @@ const BottomTabs = () => {
       keyboardDismissMode="on-drag"
       key={'BottomTabs'}
       screenOptions={({ route }) => ({
-        sceneStyle: {
-          backgroundColor: '#000000',
-        },
+        sceneStyle: styles.scene,
+        lazy: true,
         lazyPreloadDistance: 1,
-
-        tabBarLabel: ({ focused }) => (
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: 500,
-              color: focused ? 'rgba(255, 0, 0, 0.7)' : '#ffffff88',
-            }}
-          >
-            {route.name}
-          </Text>
-        ),
         swipeEnabled: false,
         animationEnabled: true,
-        lazy: true,
-        lazyPlaceholder: () => (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+
+        tabBarLabel: ({ focused, children }) => (
+          <Text
+            style={[
+              styles.tabLabel,
+              { color: focused ? styles.active.color : styles.inactive.color },
+            ]}
           >
-            <ActivityIndicator color={'#fff'} size={'large'} />
-          </View>
+            {children}
+          </Text>
         ),
       })}
     >
-      <Tab.Screen
-        name="Songs"
-        component={Main}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Icon.Music
-              color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
-              size={23}
-              strokeWidth={2}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Icon.HeartIcon
-              color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
-              size={23}
-              strokeWidth={2}
-            />
-          ),
-        }}
-        name="Favourite"
-        component={Favourite}
-      />
-      <Tab.Screen
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Icon.ListMusic
-              color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
-              size={23}
-              strokeWidth={2}
-            />
-          ),
-        }}
-        name="Playlist"
-        component={Playlist}
-      />
+      {TABS.map(tab => {
+        const TabIcon = tab.icon;
 
-      <Tab.Screen
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Icon.Users
-              color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
-              size={23}
-              strokeWidth={2}
-            />
-          ),
-        }}
-        name="Artists"
-        component={Album}
-      />
+        return (
+          <Tab.Screen
+            key={tab.name}
+            name={tab.name}
+            component={tab.component}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <TabIcon
+                  color={focused ? 'rgba(255,0,0,0.9)' : '#ffffff88'}
+                  size={23}
+                  strokeWidth={2}
+                />
+              ),
+            }}
+          />
+        );
+      })}
     </Tab.Navigator>
   );
 };
 
-export default BottomTabs;
+export default memo(BottomTabs);
+
+const styles = StyleSheet.create({
+  scene: {
+    backgroundColor: '#000',
+  },
+  placeholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tabLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  active: {
+    color: 'rgba(255, 0, 0, 0.7)',
+  },
+  inactive: {
+    color: '#ffffff88',
+  },
+});

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import React, { FC } from 'react';
+import React, { FC, memo } from 'react';
 import { PlaylistModalProps } from '../../constants/type';
 
 const PlaylistModal: FC<PlaylistModalProps> = ({
@@ -106,4 +106,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PlaylistModal;
+export default memo(PlaylistModal);

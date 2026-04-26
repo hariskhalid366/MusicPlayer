@@ -1,13 +1,12 @@
 import { Text, ToastAndroid, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import React, { useState } from 'react';
-import { useMMKVObject } from 'react-native-mmkv';
-import { Storage } from '../store/storage';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import PlayLIstItemView from '../components/PlayLIstItemView';
 import PlaylistModal from '../components/modal/PlaylistModal';
 import Header from '../components/Header';
 import { MusicFile } from '../constants/type';
 import showToast from '../components/Toast';
+import { useAudioStore } from '../store/useAudioStore';
 
 export interface PlaylistProps {
   id: string;
@@ -15,49 +14,56 @@ export interface PlaylistProps {
 }
 
 const Playlist = () => {
-  const [playlistSongs, setPlaylistSongs] =
-    useMMKVObject<PlaylistProps[]>('playlist', Storage) || [];
+  const playlists = useAudioStore(state => state.playlists);
+  const createPlaylistInStore = useAudioStore(state => state.createPlaylist);
+
   const [modal, setModal] = useState(false);
   const [text, setText] = useState<string>('');
 
-  const createPlaylist = async (item: string) => {
-    const newPlaylist: PlaylistProps = {
-      id: item.trim(),
-      songs: [],
-    };
+  const openModal = useCallback(() => setModal(true), []);
+  const closeModal = useCallback(() => setModal(false), []);
 
-    if (newPlaylist.id.length === 0) {
-      ToastAndroid.showWithGravity(
-        'Playlist title cannot be empty',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
-      return;
-    }
+  const createPlaylist = useCallback(
+    (name: string) => {
+      const trimmed = name.trim();
 
-    const playlistExists = playlistSongs?.some(
-      playlist => playlist.id === newPlaylist.id,
-    );
+      if (trimmed.length === 0) {
+        ToastAndroid.showWithGravity(
+          'Playlist title cannot be empty',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        return;
+      }
 
-    if (playlistExists) {
-      showToast('Playlist Already Exists');
-      return;
-    }
+      const exists = playlists?.some(p => p.id === trimmed);
+      if (exists) {
+        showToast('Playlist Already Exists');
+        return;
+      }
 
-    setPlaylistSongs(prev => [...(prev || []), newPlaylist]);
-    setText('');
-    setModal(false);
-  };
+      createPlaylistInStore(trimmed);
+      setText('');
+      closeModal();
+    },
+    [playlists, createPlaylistInStore, closeModal],
+  );
 
-  const deletePlaylist = (playlistName: string) => {
-    const updatePlaylist = playlistSongs?.filter(
-      playlist => playlist.id !== playlistName,
-    );
-    setPlaylistSongs(updatePlaylist);
-    showToast('Playlist removed');
-  };
+  const validplaylists = useMemo(() => playlists ?? [], [playlists]);
 
-  const validPlaylistSongs = playlistSongs || [];
+  const renderItem = useCallback(
+    ({ item, index }: { item: PlaylistProps; index: number }) => (
+      <PlayLIstItemView item={item} index={index} />
+    ),
+    [], // PlayLIstItemView is memo'd — no deps needed here
+  );
+
+  const keyExtractor = useCallback((item: PlaylistProps) => item.id, []);
+
+  const ListHeader = useMemo(
+    () => <Header title="Playlist" playlist={true} onPress={openModal} />,
+    [openModal],
+  );
 
   return (
     <>
@@ -67,23 +73,12 @@ const Playlist = () => {
           paddingHorizontal: 10,
           paddingBottom: 150,
         }}
-        data={validPlaylistSongs}
-        renderItem={({
-          item,
-          index,
-        }: {
-          item: PlaylistProps;
-          index: number;
-        }) => <PlayLIstItemView {...{ index, item, deletePlaylist }} />}
-        keyExtractor={(item: any) => item.id}
+        data={validplaylists}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        // estimatedItemSize={132}
         removeClippedSubviews={true}
-        ListHeaderComponent={
-          <Header
-            title="Playlist"
-            playlist={true}
-            onPress={() => setModal(true)}
-          />
-        }
+        ListHeaderComponent={ListHeader}
         ListEmptyComponent={
           <View
             style={{
@@ -97,9 +92,15 @@ const Playlist = () => {
         }
       />
 
-      <PlaylistModal {...{ modal, setModal, text, setText, createPlaylist }} />
+      <PlaylistModal
+        modal={modal}
+        setModal={setModal}
+        text={text}
+        setText={setText}
+        createPlaylist={createPlaylist}
+      />
     </>
   );
 };
 
-export default Playlist;
+export default memo(Playlist);

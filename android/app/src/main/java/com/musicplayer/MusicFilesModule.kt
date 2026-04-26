@@ -48,6 +48,7 @@ class MusicFilesModule(private val reactContext: ReactApplicationContext) :
                 while (it.moveToNext()) {
                     val song = WritableNativeMap()
 
+                    val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
                     val title = it.getString(titleIndex) ?: "Unknown Title"
                     val artist = it.getString(artistIndex) ?: "Unknown Artist"
                     val album = it.getString(albumIndex) ?: "Unknown Album"
@@ -59,6 +60,7 @@ class MusicFilesModule(private val reactContext: ReactApplicationContext) :
                     val artworkUri = Uri.parse("content://media/external/audio/albumart")
                     val coverUri = Uri.withAppendedPath(artworkUri, albumId.toString()).toString()
 
+                    song.putString("id", id.toString())
                     song.putString("title", title)
                     song.putString("artist", artist)
                     song.putString("album", album)
@@ -75,6 +77,27 @@ class MusicFilesModule(private val reactContext: ReactApplicationContext) :
         } catch (e: Exception) {
             Log.e("MusicFiles", "Error fetching songs", e)
             promise.reject("FETCH_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun deleteAudioFile(id: String, promise: Promise) {
+        try {
+            val contentResolver: ContentResolver = reactContext.contentResolver
+            val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            val selection = "${MediaStore.Audio.Media._ID} = ?"
+            val selectionArgs = arrayOf(id)
+
+            val deletedRows = contentResolver.delete(uri, selection, selectionArgs)
+
+            if (deletedRows > 0) {
+                promise.resolve(true)
+            } else {
+                promise.reject("DELETE_FAILED", "Could not delete file with ID: $id")
+            }
+        } catch (e: Exception) {
+            Log.e("MusicFiles", "Error deleting song", e)
+            promise.reject("DELETE_ERROR", e.message, e)
         }
     }
 }

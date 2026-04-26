@@ -92,15 +92,24 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+  release {
+    storeFile file(MYAPP_UPLOAD_STORE_FILE)
+    storePassword MYAPP_UPLOAD_STORE_PASSWORD
+    keyAlias MYAPP_UPLOAD_KEY_ALIAS
+    keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+
+   }
+
+
     }
-    // splits {
-    //     abi {
-    //         // reset()
-    //         enable true
-    //         universalApk true  // If true, also generate a universal APK
-    //         // include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
-    //     }
-    // }
+    splits {
+        abi {
+            reset()
+            enable true
+            universalApk true
+            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+        }
+    }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -112,7 +121,7 @@ android {
         //     proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         // }
          release {
-            signingConfig signingConfigs.debug
+             signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
