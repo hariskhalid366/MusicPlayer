@@ -21,6 +21,8 @@ import { MusicFile } from '../constants/type';
 import Swipable from '../components/Swipable';
 import { checkAndRequestStoragePermission } from '../constants/Permission';
 import AddSongModal from '../components/modal/AddToPlaylistModal';
+import Input from '../components/Input';
+import { LucideMail } from 'lucide-react-native';
 
 const { MusicFiles } = NativeModules;
 const PLAYLIST_ID = 'songs';
@@ -187,12 +189,15 @@ const Main = () => {
 
   const Header = useMemo(
     () => (
+      <>
       <HeaderSearchBar
         title="Songs"
         search={search}
         setSearch={setSearch}
         track={audios}
       />
+      <Input  secureTextEntry={true} leftIcon={LucideMail} iconSize={24} placeholder='Email' placeholderTextColor={"green"} iconColor='red'/>
+      </>
     ),
     [search, audios],
   );
